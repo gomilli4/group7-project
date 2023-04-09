@@ -2,6 +2,8 @@ import numpy as np
 import pygame
 import sys
 import time
+import matplotlib.pyplot as plt
+import random
 
 def grass_color_gradient(x):
     '''
@@ -166,7 +168,7 @@ class Creature:
     pass
 
 class Herbivore(pygame.sprite.Sprite, Creature):
-    def __init__(self, genes, x, y, orientation):
+    def __init__(self, genes, x, y, orientation,strength = 0):
         super().__init__()
         # position information
         self.angle = orientation
@@ -175,12 +177,8 @@ class Herbivore(pygame.sprite.Sprite, Creature):
 
         # genome information
         self.genes = genes
-        self.color = [
-            round(np.mean(self.genes['red'])),
-            round(np.mean(self.genes['green'])),
-            round(np.mean(self.genes['blue'])),
-            100 # alpha channel
-            ]
+        self.strength = strength
+        self.color = genes["color"]
         
         # defining state variables
         self.energy = np.mean(self.genes['max-energy']) # averaging value from both chromosomes
@@ -248,9 +246,16 @@ num_cells_y = round(height/cell_size)
 env_grid, env_cell_group = create_environment(num_cells_x, num_cells_y, cell_size)
 
 # test genes dictionary
-genes = {
-    'speed': [150, 150],
-    'turn-speed': [100*np.pi/180, 100*np.pi/180],
+
+
+
+
+def random_genes():
+    colors = ["red","blue"]
+    species_type = random.randint(0,1)
+    genes = {
+    'speed': [random.randint(50, 150), random.randint(50, 150)],
+    'turn-speed': [random.randint(50, 101)*np.pi/180, random.randint(50, 101)*np.pi/180],
     'fov': [180*np.pi/180, 180*np.pi/180],
     'view-dist': [60, 60],
     'max-energy': [100, 100],
@@ -258,25 +263,36 @@ genes = {
     'find-mate-rate': [3, 3],
     'max-desire-to-mate': [60, 60],
     'sex': [0, 1], # male = [0, 1] or [1, 0], female = [0, 0]
-    'red': [255, 255],
-    'green': [0, 0],
-    'blue': [0, 5]
+    
+    'species': species_type, #2 different types of species with number 0 = prey, and 1 = predator
+    'color': colors[species_type]
     }
+    return genes
 
 # test creature
+count = 0
 creature_group = pygame.sprite.Group()
-test = Herbivore(genes, width/2, height/2, -45*np.pi/180)
-creature_group.add(test)
 
+#Adds a hundred animals to environment
+for i in range(100):
+    creature_group.add(Herbivore(random_genes(), random.randint(0, 3000)/3, random.randint(0, 1000)/3, -45*np.pi/180,strength=random.randint(5,20)))
+    count += 1
+
+
+    
 # Main simulation loop. Instead of running until user clicks exit, can use conditions
 previous_time = time.time()
+carrying_capacity = random.randint(count*2,count*4)
+data_list = [] #List containing prey,predator counts and time 
 while True:
+    
     # Used to ensure framerate independence
     dt = time.time() - previous_time
     previous_time = time.time()
     
     for event in pygame.event.get(): # pygame event handling
         if event.type == pygame.QUIT: # if exit button is clicked
+            print(data_list)
             pygame.quit() # quits pygame module
             sys.exit() # exits program
 
@@ -284,6 +300,43 @@ while True:
     env_grid = advance_grid(env_grid, dt)
 
     creature_group.update(env_grid, dt)
+    
+    #These counts are meant for demonstrating stable predator prey relationships
+    
+    prey_count = 0
+    predator_count = 0 
+    
+    if (count > 1): #To prevent indexing errors
+        for i in range(count):
+            #Compares every animal within environment to each other
+            for j in range(i+1,count):
+                if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]): #Compares species type
+                    #Checks to see if two species are close to each other
+                    if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
+                        #Chceks to see if the species[i] is a predator and species[j] is prey since predators have the value 1 while prey have the value 0
+                        if (creature_group.sprites()[i].genes["species"] > creature_group.sprites()[j].genes["species"]):
+                            #Checks to see if predator is faster than prey because if so then prey is killed
+                            if (creature_group.sprites()[i].genes["speed"] > creature_group.sprites()[j].genes["speed"]):
+                                creature_group.remove(creature_group.sprites()[j])
+                                count -= 1
+                                break
+                        elif(creature_group.sprites()[i].genes["species"] < creature_group.sprites()[j].genes["species"]):
+                            if (creature_group.sprites()[i].genes["speed"] < creature_group.sprites()[j].genes["speed"]):
+                                creature_group.remove(creature_group.sprites()[i])
+                                count -= 1
+                                break
+    
+    for i in creature_group.sprites():
+        if (i.genes["species"] == 0):
+            prey_count += 1
+        else:
+            predator_count += 1
+    
+    #This list is used for modeling predator prey relations
+    data_list.append([prey_count,predator_count,time.time])
+
+    env_cell_group.draw(screen)
+    creature_group.draw(screen)
 
     env_cell_group.draw(screen)
     creature_group.draw(screen)
