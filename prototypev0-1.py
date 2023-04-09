@@ -2,6 +2,7 @@ import numpy as np
 import pygame
 import sys
 import time
+import matplotlib.pyplot as plt
 
 def grass_color_gradient(x):
     '''
@@ -166,7 +167,7 @@ class Creature:
     pass
 
 class Herbivore(pygame.sprite.Sprite, Creature):
-    def __init__(self, genes, x, y, orientation):
+    def __init__(self, genes, x, y, orientation,strength = 0):
         super().__init__()
         # position information
         self.angle = orientation
@@ -175,6 +176,7 @@ class Herbivore(pygame.sprite.Sprite, Creature):
 
         # genome information
         self.genes = genes
+        self.strength = strength
         self.color = [
             round(np.mean(self.genes['red'])),
             round(np.mean(self.genes['green'])),
@@ -260,16 +262,26 @@ genes = {
     'sex': [0, 1], # male = [0, 1] or [1, 0], female = [0, 0]
     'red': [255, 255],
     'green': [0, 0],
-    'blue': [0, 5]
+    'blue': [0, 5],
+    
     }
+
+
+
 
 # test creature
 creature_group = pygame.sprite.Group()
-test = Herbivore(genes, width/2, height/2, -45*np.pi/180)
+test = Herbivore(genes, width/3, height/3, -45*np.pi/180,strength=5)
+test2 = Herbivore(genes, width/2, height/2, 45*np.pi/180,strength=4)
 creature_group.add(test)
+creature_group.add(test2)
+
+
+
 
 # Main simulation loop. Instead of running until user clicks exit, can use conditions
 previous_time = time.time()
+count = 2
 while True:
     # Used to ensure framerate independence
     dt = time.time() - previous_time
@@ -284,10 +296,28 @@ while True:
     env_grid = advance_grid(env_grid, dt)
 
     creature_group.update(env_grid, dt)
+    
+    
+    if (count > 1):
+        for i in range(count):
+            for j in range(i+1,count):
+                if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
+                    if (creature_group.sprites()[i].strength > creature_group.sprites()[j].strength):
+                        creature_group.remove(creature_group.sprites()[j])
+                        count -= 1
+                    else:
+                        creature_group.remove(creature_group.sprites()[i])
+                        count -= 1
+        
+            
+    env_cell_group.draw(screen)
+    creature_group.draw(screen)
 
     env_cell_group.draw(screen)
     creature_group.draw(screen)
     
+    
+
     pygame.display.flip()
 
 
