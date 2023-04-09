@@ -273,20 +273,26 @@ def random_genes():
 count = 0
 creature_group = pygame.sprite.Group()
 
+#Adds a hundred animals to environment
 for i in range(100):
     creature_group.add(Herbivore(random_genes(), random.randint(0, 3000)/3, random.randint(0, 1000)/3, -45*np.pi/180,strength=random.randint(5,20)))
     count += 1
 
+
+    
 # Main simulation loop. Instead of running until user clicks exit, can use conditions
 previous_time = time.time()
 carrying_capacity = random.randint(count*2,count*4)
+data_list = [] #List containing prey,predator counts and time 
 while True:
+    
     # Used to ensure framerate independence
     dt = time.time() - previous_time
     previous_time = time.time()
     
     for event in pygame.event.get(): # pygame event handling
         if event.type == pygame.QUIT: # if exit button is clicked
+            print(data_list)
             pygame.quit() # quits pygame module
             sys.exit() # exits program
 
@@ -295,6 +301,10 @@ while True:
 
     creature_group.update(env_grid, dt)
     
+    #These counts are meant for demonstrating stable predator prey relationships
+    
+    prey_count = 0
+    predator_count = 0 
     
     if (count > 1): #To prevent indexing errors
         for i in range(count):
@@ -303,10 +313,8 @@ while True:
                 if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]): #Compares species type
                     #Checks to see if two species are close to each other
                     if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
-
                         #Chceks to see if the species[i] is a predator and species[j] is prey since predators have the value 1 while prey have the value 0
                         if (creature_group.sprites()[i].genes["species"] > creature_group.sprites()[j].genes["species"]):
-                            
                             #Checks to see if predator is faster than prey because if so then prey is killed
                             if (creature_group.sprites()[i].genes["speed"] > creature_group.sprites()[j].genes["speed"]):
                                 creature_group.remove(creature_group.sprites()[j])
@@ -317,7 +325,16 @@ while True:
                                 creature_group.remove(creature_group.sprites()[i])
                                 count -= 1
                                 break
-            
+    
+    for i in creature_group.sprites():
+        if (i.genes["species"] == 0):
+            prey_count += 1
+        else:
+            predator_count += 1
+    
+    #This list is used for modeling predator prey relations
+    data_list.append([prey_count,predator_count,time.time])
+
     env_cell_group.draw(screen)
     creature_group.draw(screen)
 
