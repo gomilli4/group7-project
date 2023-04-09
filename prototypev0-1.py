@@ -3,6 +3,7 @@ import pygame
 import sys
 import time
 import matplotlib.pyplot as plt
+import random
 
 def grass_color_gradient(x):
     '''
@@ -250,9 +251,14 @@ num_cells_y = round(height/cell_size)
 env_grid, env_cell_group = create_environment(num_cells_x, num_cells_y, cell_size)
 
 # test genes dictionary
-genes = {
-    'speed': [150, 150],
-    'turn-speed': [100*np.pi/180, 100*np.pi/180],
+
+
+
+
+def random_genes():
+    genes = {
+    'speed': [random.randint(50, 150), random.randint(50, 150)],
+    'turn-speed': [random.randint(50, 101)*np.pi/180, random.randint(50, 101)*np.pi/180],
     'fov': [180*np.pi/180, 180*np.pi/180],
     'view-dist': [60, 60],
     'max-energy': [100, 100],
@@ -263,25 +269,24 @@ genes = {
     'red': [255, 255],
     'green': [0, 0],
     'blue': [0, 5],
-    
+    'species': random.randint(0,5) #5 different types of species with numbers 0-4 associated with each species
     }
-
-
-
+    return genes
 
 # test creature
+count = 0
 creature_group = pygame.sprite.Group()
-test = Herbivore(genes, width/3, height/3, -45*np.pi/180,strength=5)
-test2 = Herbivore(genes, width/2, height/2, 45*np.pi/180,strength=4)
-creature_group.add(test)
-creature_group.add(test2)
+for i in range(random.randint(100,200)):
+    creature_group.add(Herbivore(random_genes(), random.randint(0, 3000)/3, random.randint(0, 1000)/3, -45*np.pi/180,strength=random.randint(5,20)))
+    count += 1
+
 
 
 
 
 # Main simulation loop. Instead of running until user clicks exit, can use conditions
 previous_time = time.time()
-count = 2
+carrying_capacity = random.randint(count*2,count*4)
 while True:
     # Used to ensure framerate independence
     dt = time.time() - previous_time
@@ -301,13 +306,18 @@ while True:
     if (count > 1):
         for i in range(count):
             for j in range(i+1,count):
-                if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
-                    if (creature_group.sprites()[i].strength > creature_group.sprites()[j].strength):
-                        creature_group.remove(creature_group.sprites()[j])
-                        count -= 1
-                    else:
-                        creature_group.remove(creature_group.sprites()[i])
-                        count -= 1
+                if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]):
+                    if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
+                        if (creature_group.sprites()[i].strength > creature_group.sprites()[j].strength):
+                            if (creature_group.sprites()[i].genes["speed"] > creature_group.sprites()[j].genes["speed"]):
+                                creature_group.remove(creature_group.sprites()[j])
+                                count -= 1
+                                break
+                        elif(creature_group.sprites()[i].strength < creature_group.sprites()[j].strength):
+                            if (creature_group.sprites()[i].genes["speed"] < creature_group.sprites()[j].genes["speed"]):
+                                creature_group.remove(creature_group.sprites()[i])
+                                count -= 1
+                                break
         
             
     env_cell_group.draw(screen)
