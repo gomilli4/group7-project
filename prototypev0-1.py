@@ -284,6 +284,8 @@ for i in range(100):
 previous_time = time.time()
 carrying_capacity = random.randint(count*2,count*4)
 data_list = [] #List containing prey,predator counts and time 
+time_count = 0
+loop = True
 while True:
     
     # Used to ensure framerate independence
@@ -294,8 +296,11 @@ while True:
         if event.type == pygame.QUIT: # if exit button is clicked
             print(data_list)
             pygame.quit() # quits pygame module
-            sys.exit() # exits program
+            #sys.exit() # exits program
+            loop = False
 
+    if (not loop):
+        break
     env_cell_group.update(env_grid)
     env_grid = advance_grid(env_grid, dt)
 
@@ -333,7 +338,9 @@ while True:
             predator_count += 1
     
     #This list is used for modeling predator prey relations
-    data_list.append([prey_count,predator_count,time.time])
+    data_list.append([prey_count,predator_count,time_count])
+
+    time_count += 1
 
     env_cell_group.draw(screen)
     creature_group.draw(screen)
