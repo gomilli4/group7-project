@@ -178,12 +178,7 @@ class Herbivore(pygame.sprite.Sprite, Creature):
         # genome information
         self.genes = genes
         self.strength = strength
-        self.color = [
-            round(np.mean(self.genes['red'])),
-            round(np.mean(self.genes['green'])),
-            round(np.mean(self.genes['blue'])),
-            100 # alpha channel
-            ]
+        self.color = genes["color"]
         
         # defining state variables
         self.energy = np.mean(self.genes['max-energy']) # averaging value from both chromosomes
@@ -256,6 +251,8 @@ env_grid, env_cell_group = create_environment(num_cells_x, num_cells_y, cell_siz
 
 
 def random_genes():
+    colors = ["red","blue"]
+    species_type = random.randint(0,1)
     genes = {
     'speed': [random.randint(50, 150), random.randint(50, 150)],
     'turn-speed': [random.randint(50, 101)*np.pi/180, random.randint(50, 101)*np.pi/180],
@@ -266,23 +263,19 @@ def random_genes():
     'find-mate-rate': [3, 3],
     'max-desire-to-mate': [60, 60],
     'sex': [0, 1], # male = [0, 1] or [1, 0], female = [0, 0]
-    'red': [255, 255],
-    'green': [0, 0],
-    'blue': [0, 5],
-    'species': random.randint(0,5) #5 different types of species with numbers 0-4 associated with each species
+    
+    'species': species_type, #2 different types of species with number 0 = prey, and 1 = predator
+    'color': colors[species_type]
     }
     return genes
 
 # test creature
 count = 0
 creature_group = pygame.sprite.Group()
-for i in range(random.randint(100,200)):
+
+for i in range(100):
     creature_group.add(Herbivore(random_genes(), random.randint(0, 3000)/3, random.randint(0, 1000)/3, -45*np.pi/180,strength=random.randint(5,20)))
     count += 1
-
-
-
-
 
 # Main simulation loop. Instead of running until user clicks exit, can use conditions
 previous_time = time.time()
@@ -308,12 +301,12 @@ while True:
             for j in range(i+1,count):
                 if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]):
                     if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
-                        if (creature_group.sprites()[i].strength > creature_group.sprites()[j].strength):
+                        if (creature_group.sprites()[i].genes["species"] > creature_group.sprites()[j].genes["species"]):
                             if (creature_group.sprites()[i].genes["speed"] > creature_group.sprites()[j].genes["speed"]):
                                 creature_group.remove(creature_group.sprites()[j])
                                 count -= 1
                                 break
-                        elif(creature_group.sprites()[i].strength < creature_group.sprites()[j].strength):
+                        elif(creature_group.sprites()[i].genes["species"] < creature_group.sprites()[j].genes["species"]):
                             if (creature_group.sprites()[i].genes["speed"] < creature_group.sprites()[j].genes["speed"]):
                                 creature_group.remove(creature_group.sprites()[i])
                                 count -= 1
@@ -326,8 +319,6 @@ while True:
     env_cell_group.draw(screen)
     creature_group.draw(screen)
     
-    
-
     pygame.display.flip()
 
 
