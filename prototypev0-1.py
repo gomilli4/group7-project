@@ -296,12 +296,18 @@ while True:
     creature_group.update(env_grid, dt)
     
     
-    if (count > 1):
+    if (count > 1): #To prevent indexing errors
         for i in range(count):
+            #Compares every animal within environment to each other
             for j in range(i+1,count):
-                if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]):
+                if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]): #Compares species type
+                    #Checks to see if two species are close to each other
                     if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
+
+                        #Chceks to see if the species[i] is a predator and species[j] is prey since predators have the value 1 while prey have the value 0
                         if (creature_group.sprites()[i].genes["species"] > creature_group.sprites()[j].genes["species"]):
+                            
+                            #Checks to see if predator is faster than prey because if so then prey is killed
                             if (creature_group.sprites()[i].genes["speed"] > creature_group.sprites()[j].genes["speed"]):
                                 creature_group.remove(creature_group.sprites()[j])
                                 count -= 1
@@ -311,7 +317,6 @@ while True:
                                 creature_group.remove(creature_group.sprites()[i])
                                 count -= 1
                                 break
-        
             
     env_cell_group.draw(screen)
     creature_group.draw(screen)
