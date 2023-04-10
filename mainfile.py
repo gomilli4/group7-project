@@ -9,19 +9,22 @@ from herbivore import Herbivore
 
 
 def create_environment(num_cells_x, num_cells_y, cell_size):
+    # Creates grid of zeroes, aka no grass
     env_grid = np.zeros((num_cells_y, num_cells_x))
+
+    # Sets top left and bottom right cells to be max grass
     env_grid[0, 0] = 50
-    env_grid[15, 30] = 50
+    env_grid[num_cells_y-1, num_cells_x-1] = 50
 
     # Sprite group contains pygame sprite objects. Used for drawing groups of sprites
     # in one line vs having to use for loops in main simulation loop below
     env_cell_group = pygame.sprite.Group()
 
     # Generating environment cells
-    for j in range(num_cells_x):
-        for i in range(num_cells_y):
+    for x_pos in range(num_cells_x):
+        for y_pos in range(num_cells_y):
             cell = EnvCell(
-                j * cell_size, i * cell_size, j, i, cell_size, cell_size, env_grid[i, j]
+                x_pos, y_pos, cell_size, env_grid[y_pos, x_pos]
             )
             env_cell_group.add(cell)
 
@@ -61,7 +64,7 @@ def advance_grid(grid, dt):
     color on the screen
     """
     max_grass = 50
-    grow_rate = 30
+    grow_rate = 15
 
     new_grid = np.zeros_like(grid)
 

@@ -53,18 +53,17 @@ class EnvCell(pygame.sprite.Sprite):
     for drawing to the screen
     """
 
-    def __init__(self, x, y, id_x, id_y, width, height, grass):
+    def __init__(self, x, y, cell_size, grass):
         super().__init__()
-        self.pos_x = x
-        self.pos_y = y
-        self.id_x = id_x
-        self.id_y = id_y
-        self.width = width
-        self.height = height
+        self.pos_x = x * cell_size
+        self.pos_y = y * cell_size
+        self.id_x = x
+        self.id_y = y
+        self.cell_size = cell_size
         self.grass = grass
 
         # Pygame stuff for drawing cell to screen
-        self.image = pygame.Surface([self.width, self.height])
+        self.image = pygame.Surface([self.cell_size, self.cell_size])
         self.image.fill(grass_color_gradient(self.grass / 50))
         self.rect = self.image.get_rect()
         self.rect.topleft = [self.pos_x, self.pos_y]

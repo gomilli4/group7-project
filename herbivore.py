@@ -32,7 +32,7 @@ class Herbivore(pygame.sprite.Sprite, Creature):
 
         # pygame drawing information
         self.picture = pygame.image.load(
-            "base-herbivore.png"
+            "hawk.png"
         ).convert_alpha()  # converting makes draw time faster I guess
         self.picture = pygame.transform.scale(self.picture, (20, 20))
         # base-herbivore.png is white so the next line
