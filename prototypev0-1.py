@@ -247,11 +247,8 @@ env_grid, env_cell_group = create_environment(num_cells_x, num_cells_y, cell_siz
 
 # test genes dictionary
 
-
-
-
 def random_genes():
-    colors = ["red","blue"]
+    colors = ["blue","red"]
     species_type = random.randint(0,1)
     genes = {
     'speed': [random.randint(50, 150), random.randint(50, 150)],
@@ -261,13 +258,24 @@ def random_genes():
     'max-energy': [100, 100],
     'metabolism-rate': [5, 5],
     'find-mate-rate': [3, 3],
-    'max-desire-to-mate': [60, 60],
-    'sex': [0, 1], # male = [0, 1] or [1, 0], female = [0, 0]
+    'max-desire-to-mate': random.randint(0,50), #To mate desire of two species must added up must be above 60
+    'sex': random.randint(0,1), # male = [0, 1] or [1, 0], female = [0, 0]
     
     'species': species_type, #2 different types of species with number 0 = prey, and 1 = predator
-    'color': colors[species_type]
+    'color': colors[species_type],
+    
     }
     return genes
+
+
+def reproduce(Herbivore1,Herbivore2):
+    child = Herbivore(genes=random_genes(),x=random.randint(0, 3000)/3,y=random.randint(0, 1000)/3,orientation=-45*np.pi/180,strength=random.randint(5,20))
+    Herbivore1.genes['max-desire-to-mate'] = -1000
+    Herbivore2.genes['max-desire-to-mate'] = -1000
+    child.genes['max-desire-to-mate'] = 0 #Resets to prevent constant reproduction
+    child.genes['color'] = Herbivore1.genes['color'] #Make sures child has some color as parents
+    child.genes['species'] = Herbivore1.genes['species'] #Make sures child is same species
+    return child
 
 # test creature
 count = 0
@@ -294,7 +302,7 @@ while True:
     
     for event in pygame.event.get(): # pygame event handling
         if event.type == pygame.QUIT: # if exit button is clicked
-            print(data_list)
+            
             pygame.quit() # quits pygame module
             #sys.exit() # exits program
             loop = False
@@ -318,6 +326,8 @@ while True:
                 if (creature_group.sprites()[i].genes["species"] != creature_group.sprites()[j].genes["species"]): #Compares species type
                     #Checks to see if two species are close to each other
                     if ((abs(creature_group.sprites()[i].pos[0]-creature_group.sprites()[j].pos[0]) < 50) and (abs(creature_group.sprites()[i].pos[1]-creature_group.sprites()[j].pos[1]) < 50)):
+
+
                         #Chceks to see if the species[i] is a predator and species[j] is prey since predators have the value 1 while prey have the value 0
                         if (creature_group.sprites()[i].genes["species"] > creature_group.sprites()[j].genes["species"]):
                             #Checks to see if predator is faster than prey because if so then prey is killed
@@ -330,13 +340,26 @@ while True:
                                 creature_group.remove(creature_group.sprites()[i])
                                 count -= 1
                                 break
-    
+                        
+                #Check for reproduction
+                if (creature_group.sprites()[i].genes["species"] == creature_group.sprites()[j].genes["species"]):
+                    if ((creature_group.sprites()[i].genes['max-desire-to-mate']+creature_group.sprites()[j].genes['max-desire-to-mate']) > 60):
+                        child = reproduce(Herbivore1=creature_group.sprites()[i],Herbivore2=creature_group.sprites()[j])
+                        creature_group.add(child)
+                        print("Reproduce Done")
+
+                                
+
+
+    for i in creature_group.sprites():
+        i.genes["max-desire-to-mate"] += random.randint(5,20)
+
     for i in creature_group.sprites():
         if (i.genes["species"] == 0):
             prey_count += 1
         else:
             predator_count += 1
-    
+    print(predator_count)
     #This list is used for modeling predator prey relations
     data_list.append([prey_count,predator_count,time_count])
 
@@ -349,5 +372,26 @@ while True:
     creature_group.draw(screen)
     
     pygame.display.flip()
+
+
+#plt_1 = plt.figure(figsize=(30, 30))
+#plt.plot(data_list[:][2],data_list[:][0])
+predator_count = []
+prey_count = []
+time_count = []
+for i in data_list:
+    predator_count.append(i[1])
+    prey_count.append(i[0])
+    time_count.append(i[2])
+
+# plt.plot(time_count,prey_count)
+# plt.xlabel = "Time"
+# plt.ylabel = "Prey_count"
+
+# plt.plot(time_count,predator_count)
+# plt.xlabel = "Time"
+# plt.ylabel = "Predator_count"
+
+# plt.show()
 
 
