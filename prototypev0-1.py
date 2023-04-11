@@ -178,7 +178,7 @@ class Herbivore(pygame.sprite.Sprite, Creature):
         # genome information
         self.genes = genes
         self.strength = strength
-        self.color = genes["color"]
+        
         
         # defining state variables
         self.energy = np.mean(self.genes['max-energy']) # averaging value from both chromosomes
@@ -190,7 +190,7 @@ class Herbivore(pygame.sprite.Sprite, Creature):
         self.picture = pygame.transform.scale(self.picture, (20, 20))
         # base-herbivore.png is white so the next line
         # tints it to the be color determined by it's genes
-        self.picture.fill(self.color, special_flags=pygame.BLEND_MULT)
+        self.picture.fill(self.genes["color"], special_flags=pygame.BLEND_MULT)
 
         self.image = self.rotate(self.picture, -self.angle)
         self.rect = self.image.get_rect()
@@ -255,26 +255,43 @@ def random_genes():
     'turn-speed': [random.randint(50, 101)*np.pi/180, random.randint(50, 101)*np.pi/180],
     'fov': [180*np.pi/180, 180*np.pi/180],
     'view-dist': [60, 60],
-    'max-energy': [100, 100],
-    'metabolism-rate': [5, 5],
-    'find-mate-rate': [3, 3],
+    'max-energy': 100,
+    'metabolism-rate': 5,
+    'find-mate-rate': 3,
     'max-desire-to-mate': random.randint(0,50), #To mate desire of two species must added up must be above 60
     'sex': random.randint(0,1), # male = [0, 1] or [1, 0], female = [0, 0]
     
     'species': species_type, #2 different types of species with number 0 = prey, and 1 = predator
     'color': colors[species_type],
-    
+   
     }
     return genes
 
 
 def reproduce(Herbivore1,Herbivore2):
-    child = Herbivore(genes=random_genes(),x=random.randint(0, 3000)/3,y=random.randint(0, 1000)/3,orientation=-45*np.pi/180,strength=random.randint(5,20))
+
+    child = Herbivore(genes=Herbivore1.genes,x=random.randint(0, 3000)/3,y=random.randint(0, 1000)/3,orientation=-45*np.pi/180,strength=random.randint(5,20))
     Herbivore1.genes['max-desire-to-mate'] = -1000
     Herbivore2.genes['max-desire-to-mate'] = -1000
     child.genes['max-desire-to-mate'] = 0 #Resets to prevent constant reproduction
-    child.genes['color'] = Herbivore1.genes['color'] #Make sures child has some color as parents
-    child.genes['species'] = Herbivore1.genes['species'] #Make sures child is same species
+    
+    return mutation(child)
+
+def mutation(child):
+    
+    #color  mutation
+    if (np.random.choice([0,1], p=[0.75,0.25])): #0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
+        child.genes['color'] = np.random.choice(["blue","red","yellow","purple","black"], p=[0.35,0.35,0.15,0.10,0.05])
+        child.picture.fill(child.genes["color"], special_flags=pygame.BLEND_MULT) #This changes the color being displayed in the simulation
+    
+    #Turn speed mutation
+    if (np.random.choice([0,1], p=[0.75,0.25])): #0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
+        child.genes['turn-speed'] = random.randint(50, 101)*np.pi/180, random.randint(50, 101)*np.pi/180
+    #Speed mutation
+    if (np.random.choice([0,1], p=[0.75,0.25])):
+        child.genes['speed'] = [random.randint(50, 150), random.randint(50, 150)]
+    
+
     return child
 
 # test creature
@@ -335,6 +352,7 @@ while True:
                                 creature_group.remove(creature_group.sprites()[j])
                                 count -= 1
                                 break
+                
                         elif(creature_group.sprites()[i].genes["species"] < creature_group.sprites()[j].genes["species"]):
                             if (creature_group.sprites()[i].genes["speed"] < creature_group.sprites()[j].genes["speed"]):
                                 creature_group.remove(creature_group.sprites()[i])
@@ -346,10 +364,6 @@ while True:
                     if ((creature_group.sprites()[i].genes['max-desire-to-mate']+creature_group.sprites()[j].genes['max-desire-to-mate']) > 60):
                         child = reproduce(Herbivore1=creature_group.sprites()[i],Herbivore2=creature_group.sprites()[j])
                         creature_group.add(child)
-                        print("Reproduce Done")
-
-                                
-
 
     for i in creature_group.sprites():
         i.genes["max-desire-to-mate"] += random.randint(5,20)
@@ -359,7 +373,6 @@ while True:
             prey_count += 1
         else:
             predator_count += 1
-    print(predator_count)
     #This list is used for modeling predator prey relations
     data_list.append([prey_count,predator_count,time_count])
 
