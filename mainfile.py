@@ -105,7 +105,7 @@ def random_genes():
 def reproduce(Animal1, Animal2):
     """
     Function that reproduces species
-    Parameters: Herbivore1: Parent 1, Herbivore2: Parent2
+    Parameters: Amimal1: Parent 1, Animal2: Parent2
     Return: Child of parents
     """
     child = Animal(
