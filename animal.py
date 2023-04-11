@@ -1,16 +1,10 @@
 import numpy as np
 import pygame
 
-
-class Creature:
-    """
-    General behavioral functions can go here
-    """
-
-    pass
+from grid_functions import on_board
 
 
-class Herbivore(pygame.sprite.Sprite, Creature):
+class Animal(pygame.sprite.Sprite):
     def __init__(self, genes, x, y, orientation, strength=0):
         super().__init__()
         # position information
@@ -52,15 +46,15 @@ class Herbivore(pygame.sprite.Sprite, Creature):
         rotated_surface = pygame.transform.rotozoom(surface, angle * 180 / np.pi, 1)
         return rotated_surface
 
-    def update(self, grid, dt):
+    def update(self, grid, timestep):
         # updates the angle by the turn speed
-        self.angle += np.mean(self.genes["turn-speed"]) * dt
+        self.angle += np.mean(self.genes["turn-speed"]) * timestep
 
         # updates its orientation vector with new angle
         self.normal = np.array([np.cos(self.angle), np.sin(self.angle)])
 
         # updates its position with its speed and new normal vector
-        self.pos = self.pos + self.normal * np.mean(self.genes["speed"]) * dt
+        self.pos = self.pos + self.normal * np.mean(self.genes["speed"]) * timestep
 
         # rotates the image according to new angle
         self.image = self.rotate(self.picture, -self.angle)
@@ -70,6 +64,8 @@ class Herbivore(pygame.sprite.Sprite, Creature):
         self.rect.center = [round(self.pos[0]), round(self.pos[1])]
 
         # eat the grass
-        column = int(self.pos[0] / 25)
-        row = int(self.pos[1] / 25)
-        grid[row, column] = 0  # I'm honestly not sure yet why the row and column is switched, still have to look closer
+        x = int(self.pos[0] / 25)
+        y = int(self.pos[1] / 25)
+        if (on_board(x, y, grid)):
+            if grid[x, y] == 50:
+                grid[x, y] = 0

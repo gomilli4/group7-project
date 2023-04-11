@@ -53,27 +53,24 @@ class EnvCell(pygame.sprite.Sprite):
     for drawing to the screen
     """
 
-    def __init__(self, x, y, cell_size, grass):
+    def __init__(self, x, y, cell_size, grass_height):
         super().__init__()
-        self.pos_x = x * cell_size
-        self.pos_y = y * cell_size
-        self.id_x = x
-        self.id_y = y
-        self.cell_size = cell_size
-        self.grass = grass
+        self.x = x
+        self.y = y
+        self.grass_height = grass_height
 
         # Pygame stuff for drawing cell to screen
-        self.image = pygame.Surface([self.cell_size, self.cell_size])
-        self.image.fill(grass_color_gradient(self.grass / 50))
+        self.image = pygame.Surface([cell_size, cell_size])
+        self.image.fill(grass_color_gradient(self.grass_height / 50))
         self.rect = self.image.get_rect()
-        self.rect.topleft = [self.pos_x, self.pos_y]
+        self.rect.topleft = [self.x * cell_size, self.y * cell_size]
 
     def update(self, grid):
         # gets the grass amount from the environment grid
-        self.grass = grid[self.id_y, self.id_x]
+        self.grass_height = grid[self.x, self.y]
 
         # updates its color in accordance with the grass_color_gradient function
-        self.image.fill(grass_color_gradient(self.grass / 50))
+        self.image.fill(grass_color_gradient(self.grass_height / 50))
 
         # NOTE: 50 is the maximum grass amount per cell as decided in the
         # advance_grid function. It's probably best to find a way to pass
