@@ -103,6 +103,11 @@ def random_genes():
 
 
 def reproduce(Animal1, Animal2):
+    """
+    Function that reproduces species
+    Parameters: Herbivore1: Parent 1, Herbivore2: Parent2
+    Return: Child of parents
+    """
     child = Animal(
         genes=Animal1.genes,
         x=random.randint(0, env_width)*cell_size,
@@ -118,6 +123,11 @@ def reproduce(Animal1, Animal2):
 
 
 def mutation(child):
+    """
+    Function that may mutate newly produced child
+    Parameters: Child: Child that was just produced from reproduce function
+    Returns: Child that may have been mutated
+    """
     # color  mutation
     if random.random() < 0.25:  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
         child.genes["color"] = np.random.choice(
@@ -253,7 +263,6 @@ while True:
                             creature_group.sprites()[j],
                         )
                         creature_group.add(child)
-                        print("Reproduce Done")
 
     for i in creature_group.sprites():
         i.genes["max-desire-to-mate"] += random.randint(5, 20)
