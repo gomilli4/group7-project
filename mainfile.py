@@ -102,28 +102,24 @@ def random_genes():
     return genes
 
 
-def reproduce(Herbivore1, Herbivore2):
-
+def reproduce(Animal1, Animal2):
     child = Animal(
-        genes=Herbivore1.genes,
-        x=random.randint(0, 3000) / 3,
-        y=random.randint(0, 1000) / 3,
+        genes=Animal1.genes,
+        x=random.randint(0, env_width)*cell_size,
+        y=random.randint(0, env_height)*cell_size,
         orientation=-45 * np.pi / 180,
         strength=random.randint(5, 20),
     )
-    Herbivore1.genes["max-desire-to-mate"] = -1000
-    Herbivore2.genes["max-desire-to-mate"] = -1000
+    Animal1.genes["max-desire-to-mate"] = -1000
+    Animal2.genes["max-desire-to-mate"] = -1000
     child.genes["max-desire-to-mate"] = 0  # Resets to prevent constant reproduction
 
     return mutation(child)
 
 
 def mutation(child):
-
     # color  mutation
-    if np.random.choice(
-        [0, 1], p=[0.75, 0.25]
-    ):  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
+    if random.random() < 0.25:  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
         child.genes["color"] = np.random.choice(
             ["blue", "red", "yellow", "purple", "black"],
             p=[0.35, 0.35, 0.15, 0.10, 0.05],
@@ -133,15 +129,14 @@ def mutation(child):
         )  # This changes the color being displayed in the simulation
 
     # Turn speed mutation
-    if np.random.choice(
-        [0, 1], p=[0.75, 0.25]
-    ):  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
+    if random.random() < 0.25:  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
         child.genes["turn-speed"] = (
             random.randint(50, 101) * np.pi / 180,
             random.randint(50, 101) * np.pi / 180,
         )
+
     # Speed mutation
-    if np.random.choice([0, 1], p=[0.75, 0.25]):
+    if random.random() < 0.25:
         child.genes["speed"] = [random.randint(50, 150), random.randint(50, 150)]
 
     return child

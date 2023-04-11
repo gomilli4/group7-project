@@ -25,9 +25,21 @@ class Animal(pygame.sprite.Sprite):
         self.desire_mate = 0
 
         # pygame drawing information
-        self.picture = pygame.image.load(
-            "hawk.png"
-        ).convert_alpha()  # converting makes draw time faster I guess
+        if self.genes["species"] == 0:
+            self.picture = pygame.image.load(
+                "hawk.png"
+            ).convert_alpha()  # converting makes draw time faster I guess
+
+        elif self.genes["species"] == 1:
+            self.picture = pygame.image.load(
+                "mouse.png"
+            ).convert_alpha()  # converting makes draw time faster I guess
+        
+        else:
+            self.picture = pygame.image.load(
+                "base-herbivore.png"
+            ).convert_alpha()  # converting makes draw time faster I guess
+            
         self.picture = pygame.transform.scale(self.picture, (20, 20))
         # base-herbivore.png is white so the next line
         # tints it to the be color determined by it's genes
