@@ -15,6 +15,7 @@ env_width = 50
 env_height = 25
 cell_size = 25
 
+
 def create_environment(num_cells_x, num_cells_y):
     # Creates grid of zeroes, aka no grass
     grass_grid = np.full((num_cells_x, num_cells_y), max_grass_height)
@@ -26,9 +27,7 @@ def create_environment(num_cells_x, num_cells_y):
     # Generating environment cells
     for x_pos in range(num_cells_x):
         for y_pos in range(num_cells_y):
-            cell = EnvCell(
-                x_pos, y_pos, cell_size, max_grass_height
-            )
+            cell = EnvCell(x_pos, y_pos, cell_size, max_grass_height)
             env_cell_group.add(cell)
 
     return grass_grid, env_cell_group
@@ -58,7 +57,7 @@ def grow_grass(grass_grid, timestep):
                 if next_value > max_grass_height:
                     next_value = max_grass_height
                 new_grid[x, y] = next_value
-            
+
             else:
                 new_grid[x, y] = grass_grid[x, y]
 
@@ -69,7 +68,7 @@ def grow_grass(grass_grid, timestep):
 pygame.init()
 
 # Defining the screen size
-screen = pygame.display.set_mode((env_width*cell_size, env_height*cell_size))
+screen = pygame.display.set_mode((env_width * cell_size, env_height * cell_size))
 
 # env_grid is the numpy array that holds the grass values,
 # env_cell_group is the pygame sprite group for drawing the
@@ -90,9 +89,9 @@ def random_genes():
         ],
         "fov": [180 * np.pi / 180, 180 * np.pi / 180],
         "view-dist": [60, 60],
-        "max-energy": [100, 100],
-        "metabolism-rate": [5, 5],
-        "find-mate-rate": [3, 3],
+        "max-energy": 100,
+        "metabolism-rate": 5,
+        "find-mate-rate": 3,
         "max-desire-to-mate": random.randint(
             0, 50
         ),  # To mate desire of two species must added up must be above 60
@@ -103,23 +102,48 @@ def random_genes():
     return genes
 
 
-def reproduce(Animal1, Animal2):
+def reproduce(Herbivore1, Herbivore2):
+
     child = Animal(
-        genes=random_genes(),
-        x=random.randint(0, env_width-1)*cell_size,
-        y=random.randint(0, env_height-1)*cell_size,
+        genes=Herbivore1.genes,
+        x=random.randint(0, 3000) / 3,
+        y=random.randint(0, 1000) / 3,
         orientation=-45 * np.pi / 180,
         strength=random.randint(5, 20),
     )
-    Animal1.genes["max-desire-to-mate"] = -1000
-    Animal2.genes["max-desire-to-mate"] = -1000
+    Herbivore1.genes["max-desire-to-mate"] = -1000
+    Herbivore2.genes["max-desire-to-mate"] = -1000
     child.genes["max-desire-to-mate"] = 0  # Resets to prevent constant reproduction
-    child.genes["color"] = Animal1.genes[
-        "color"
-    ]  # Make sures child has some color as parents
-    child.genes["species"] = Animal1.genes[
-        "species"
-    ]  # Make sures child is same species
+
+    return mutation(child)
+
+
+def mutation(child):
+
+    # color  mutation
+    if np.random.choice(
+        [0, 1], p=[0.75, 0.25]
+    ):  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
+        child.genes["color"] = np.random.choice(
+            ["blue", "red", "yellow", "purple", "black"],
+            p=[0.35, 0.35, 0.15, 0.10, 0.05],
+        )
+        child.picture.fill(
+            child.genes["color"], special_flags=pygame.BLEND_MULT
+        )  # This changes the color being displayed in the simulation
+
+    # Turn speed mutation
+    if np.random.choice(
+        [0, 1], p=[0.75, 0.25]
+    ):  # 0 represents no mutation and 75% chance of ocurring, #1 represents 25% of occurring
+        child.genes["turn-speed"] = (
+            random.randint(50, 101) * np.pi / 180,
+            random.randint(50, 101) * np.pi / 180,
+        )
+    # Speed mutation
+    if np.random.choice([0, 1], p=[0.75, 0.25]):
+        child.genes["speed"] = [random.randint(50, 150), random.randint(50, 150)]
+
     return child
 
 
@@ -230,8 +254,8 @@ while True:
                         + creature_group.sprites()[j].genes["max-desire-to-mate"]
                     ) > 60:
                         child = reproduce(
-                            Animal1=creature_group.sprites()[i],
-                            Animal2=creature_group.sprites()[j],
+                            creature_group.sprites()[i],
+                            creature_group.sprites()[j],
                         )
                         creature_group.add(child)
                         print("Reproduce Done")
