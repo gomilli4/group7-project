@@ -171,6 +171,8 @@ while running:
         num_herbivores.append(herb_count)
         num_carnivores.append(carn_count)
 
+        if herb_count == 0 or carn_count == 0:
+            running=False
         # defining variables that will be summed up based on
         # creature stats to be 0
         speed = 0
