@@ -1,0 +1,2 @@
+Mutation rate: 20%
+I changed the code to see if the mating cooldown period timer worked and things ran similarly. The population didn't grow as quickly, and the creatures don't adapt as quickly and get better at surviving due to the lower mutation rate.

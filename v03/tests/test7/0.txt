@@ -1,0 +1,19 @@
+Mutation rate at 20%
+Maximum life span between 9000 and 11000 frames
+
+Stable carrying capacity has shown up. Environment started selecting for huge FOVs and view distances, I assume in an attempt to find mates more efficiently since the creatures only exist for a finite period of time.
+
+Carrying capacity is slowly increasing. Need to be able to plot average gene values to see if it correlates with changes in gene expression frequency.
+
+Most creatures have FOVs larger than 200deg which makes sense to me. If you can only see the potential mates in front of you, then you miss all of the ones behind you and don't get to reproduce as much.
+
+I think the simulation is also selecting for larger energy requirements. There was a population boom, and it might follow that the larger their max-energy, the more time they can spend finding mates and reproducing than they have to spend eating like in the early simulation.
+
+I think too that the metabolism rate could be decreasing which improves things in a similar way as described above.
+
+Note, using the debug mode (clicking on a creature), you can see genes like the metabolism rate, the FOV, visual range, rate at which desire-to-mate increases, etc. Desparately need and want to add ability to plot actual gene averages.
+
+All of the creatures are the same color of purple. I also see from the graphs that there is a new carrying capacity that has appeared. I think the simulation is running out of genes to optimize and the population is going to level out between 40 and 50 agents. The classic* oscillations about the capacity are there (*I think they are classic and typical? I saw them in hw3 and google says real populations tend to oscillate above and below). It's good to know that the system behaves as expected. I wonder how predators will influence this behavior.
+
+I just saw the desire-to-mate rate for one of the herbivores and it was insanely fast so that probably has something to do with the increasing capacity too. There's no way to check yet but they all have similar colors, FOVs, and view distances, so I would assume they all have similar genomes. Another layer of complexity would be to add biological costs to things (e.g. having a slow metabolism means you have a slower max-speed). I think this would make the simulation even more dynamic.
+

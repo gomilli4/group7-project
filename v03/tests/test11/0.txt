@@ -1,0 +1,14 @@
+Change log:
+    age of maturity lowered from 200 to 50
+    energy from grass increased from grass-amount/10 to grass-amount/5
+    lowered percentage of energy that will make predators hunt from 50% to 25%
+
+Results:
+    Failure. I think the predators lived a little longer but still died out.
+
+TO TRY:
+    Look at prey population gene averages and see which trait is being selected for to outcompete the predators.
+    Create a stable range of prey genes for reproducibile results then engineer the predators in such a way to be stable.
+
+THOUGHTS:
+    I don't think stable predator prey dynamics will be possible. I can see short term ones, but not long term. The prey animals have it too easy. The grass never stops growing, nor does it compete against them. The predators only food source is actively evolving to not be eaten, so I can't imagine a scenario where either the predators or prey animals don't reach a maximum fitness and outcompete the others.

@@ -1,0 +1,7 @@
+Change log:
+    age of maturity lowered from 200 to 50
+    energy from grass increased from grass-amount/10 to grass-amount/5
+
+Results:
+    The prey population didn't decrease as much since it was easier for them to live. Might be useful so I'm keeping those changes.
+    I'm going to decrease the energy% at which the predators start hunting to try and get them to focus more on reproducing

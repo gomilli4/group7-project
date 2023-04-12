@@ -1,0 +1,11 @@
+I haven't been able to get any kind of stability with predators and prey. Either all the predators starve and the prey proliferates, or the predators are too successful and then starve when the prey are pushed to extinction. I am randomly generating the genes for both the predator and prey species so maybe I'll have to set the genes manually or find more suitable ranges.
+
+Changes for this test:
+    Decreased the age of maturity for the prey from 200 to 50. Maybe if they can mate sooner they'll have a better chance at surviving.
+
+Potential changes for future:
+    Increase the amount of energy the prey gets from grass so that they can spend less time eating and more time reproducing.
+    Increase the litter size of the prey
+
+RESULTS:
+    Predators outcompeted the prey and starved.
