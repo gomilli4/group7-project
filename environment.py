@@ -2,13 +2,13 @@ import numpy as np
 import pygame
 
 def grass_color_gradient(x):
-    '''
+    """
     Dirt to grass gradient generated from colordesigner.io/gradient-generator.
     Used website because RGB color space is nonlinear apparently and my homemade
     interpolation didn't work
 
     x is the current grass amount divided by the maximum grass (set to 50)
-    
+
     (205, 133, 63)
     (193, 134, 50)
     (180, 136, 38)
@@ -22,7 +22,7 @@ def grass_color_gradient(x):
 
     Smooth interpolation may be possible through some other method.
     Look into HSV or HSL
-    '''
+    """
     if 0 <= x and x < 0.1:
         return (205, 133, 63)
     elif 0.1 <= x and x < 0.2:
@@ -50,8 +50,7 @@ def create_environment(num_cells_x, num_cells_y, cell_size):
     """
     Initializes the environement and creates the cells
     """
-    env_grid = np.ones((num_cells_y, num_cells_x))
-    env_grid = env_grid * 50
+    env_grid = np.full((num_cells_y, num_cells_x), 50)
 
     hashing_grid = np.zeros((num_cells_y, num_cells_x), dtype=object)
 
@@ -63,7 +62,7 @@ def create_environment(num_cells_x, num_cells_y, cell_size):
     for j in range(num_cells_x):
         for i in range(num_cells_y):
             hashing_grid[i, j] = []
-            cell = Env_Cell(j * cell_size, i * cell_size, j, i, cell_size, cell_size, env_grid[i, j])
+            cell = Env_Cell(j * cell_size, i * cell_size, j, i, cell_size)
             env_cell_group.add(cell)
 
     return env_grid, env_cell_group, hashing_grid
@@ -127,33 +126,32 @@ def advance_grid(grid, dt):
     return new_grid
 
 class Env_Cell(pygame.sprite.Sprite):
-    '''
+    """
     Cells for the environment grass grid. Inherits from pygame sprite class
     for drawing to the screen
-    '''
-    def __init__(self, x, y, id_x, id_y, width, height, grass):
+    """
+    def __init__(self, x, y, id_x, id_y, size):
         super().__init__()
         self.pos_x = x
         self.pos_y = y
         self.id_x = id_x
         self.id_y = id_y
-        self.width = width
-        self.height = height
-        self.grass = grass
-        
+        self.size = size
+        self.grass = 50 # Initialize to maximum grass height
+
         # Pygame stuff for drawing cell to screen
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(grass_color_gradient(self.grass/50))
+        self.image = pygame.Surface([self.size, self.size])
+        self.image.fill(grass_color_gradient(self.grass / 50))
         self.rect = self.image.get_rect()
         self.rect.topleft = [self.pos_x, self.pos_y]
-    
+
     def update(self, grid):
         # gets the grass amount from the environment grid
         self.grass = grid[self.id_y, self.id_x]
-        
+
         # updates its color in accordance with the grass_color_gradient function
-        self.image.fill(grass_color_gradient(self.grass/50))
-        
+        self.image.fill(grass_color_gradient(self.grass / 50))
+
         # NOTE: 50 is the maximum grass amount per cell as decided in the
         # advance_grid function. It's probably best to find a way to pass
         # this variable to the update function to avoid future issues,
