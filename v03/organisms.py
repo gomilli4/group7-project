@@ -103,7 +103,7 @@ class Herbivore(pygame.sprite.Sprite):
         row = int(self.pos[1]/25)
         self.neighbor_cells = self.getNeighborValues(row, column, hashing_grid)
 
-        if hunger >= self.desire_mate and self.energy <= 0.5*self.max_energy: # and not see predator
+        if hunger >= self.desire_mate and self.energy <= 0.28*self.max_energy: # and not see predator
             self.state = 0
             self.doing = True
         
@@ -200,8 +200,12 @@ class Herbivore(pygame.sprite.Sprite):
             self.counter += 1
 
     def request_mate(self, mate, hashing_grid, group):
-        gamete = self.form_gamete()
-        mate.receive_request(self, gamete, hashing_grid, group)
+        litter_size = 2
+        litter = []
+        for i in range(litter_size):
+            gamete = self.form_gamete()
+            litter.append(gamete)
+        mate.receive_request(self, litter, hashing_grid, group)
 
     def form_gamete(self):
         '''
@@ -247,15 +251,18 @@ class Herbivore(pygame.sprite.Sprite):
         
         return haploid_cell
 
-    def receive_request(self, mate, paternal_gamete, hashing_grid, group):
+    def receive_request(self, mate, paternal_litter, hashing_grid, group):
         '''
         If it's old enough and can mate and is in the find_mate state it will
         form a gamete and pass the two sets of genes to the create_offspring
         function
         '''
         if self.age >= self.maturity and self.can_mate and self.state == 1:
-            maternal_gamete = self.form_gamete()
-            self.create_offspring(paternal_gamete, maternal_gamete, hashing_grid, group)
+            maternal_litter = []
+            for i in range(len(paternal_litter)):
+                maternal_gamete = self.form_gamete()
+                maternal_litter.append(maternal_gamete)
+            self.create_offspring(paternal_litter, maternal_litter, hashing_grid, group)
             self.desire_mate = 0
             self.can_mate = False
             self.state = 3
@@ -265,22 +272,23 @@ class Herbivore(pygame.sprite.Sprite):
         Combines both sets of genes, creates a new Herbivore object,
         and adds it to creature_group to start being drawn and updated
         '''
-        genes = {
-            'speed': [p['speed'], m['speed']],
-            'turn-speed': [p['turn-speed'], m['turn-speed']],
-            'fov': [p['fov'], m['fov']],
-            'view-dist': [p['view-dist'], m['view-dist']],
-            'max-energy': [p['max-energy'], m['max-energy']],
-            'metabolism-rate': [p['metabolism-rate'], m['metabolism-rate']],
-            'find-mate-rate': [p['find-mate-rate'], m['find-mate-rate']],
-            'max-desire-to-mate': [p['max-desire-to-mate'], m['max-desire-to-mate']],
-            'sex': [p['sex'], m['sex']],
-            'red': [p['red'], m['red']],
-            'green': [p['green'], m['green']],
-            'blue': [p['blue'], m['blue']]
-            }
-        offspring = Herbivore(genes, self.pos[0]+1, self.pos[1]+1, self.angle, hashing_grid)
-        group.add(offspring)
+        for i in range(len(p)):
+            genes = {
+                'speed': [p[i]['speed'], m[i]['speed']],
+                'turn-speed': [p[i]['turn-speed'], m[i]['turn-speed']],
+                'fov': [p[i]['fov'], m[i]['fov']],
+                'view-dist': [p[i]['view-dist'], m[i]['view-dist']],
+                'max-energy': [p[i]['max-energy'], m[i]['max-energy']],
+                'metabolism-rate': [p[i]['metabolism-rate'], m[i]['metabolism-rate']],
+                'find-mate-rate': [p[i]['find-mate-rate'], m[i]['find-mate-rate']],
+                'max-desire-to-mate': [p[i]['max-desire-to-mate'], m[i]['max-desire-to-mate']],
+                'sex': [p[i]['sex'], m[i]['sex']],
+                'red': [p[i]['red'], m[i]['red']],
+                'green': [p[i]['green'], m[i]['green']],
+                'blue': [p[i]['blue'], m[i]['blue']]
+                }
+            offspring = Herbivore(genes, self.pos[0]+1+i, self.pos[1]+1+i, self.angle, hashing_grid)
+            group.add(offspring)
         # self, genes, x, y, orientation, hashing_grid
         
     def onBoard(self, i, j, grid):
@@ -573,7 +581,7 @@ class Carnivore(pygame.sprite.Sprite):
         row = int(self.pos[1]/25)
         self.neighbor_cells = self.getNeighborValues(row, column, hashing_grid)
 
-        if hunger >= self.desire_mate and self.energy <= 0.25*self.max_energy:
+        if hunger >= self.desire_mate and self.energy <= 0.5*self.max_energy:
             self.state = 0
             self.doing = True
         
@@ -616,7 +624,7 @@ class Carnivore(pygame.sprite.Sprite):
                 self.look_at(self.target.pos, dt)
                 vec_to_target = self.target.pos - self.pos
                 dist_to_target = np.linalg.norm(vec_to_target)
-                if dist_to_target <= 10:
+                if dist_to_target <= 40:
                     self.energy += 200
                     if self.energy >= max_energy:
                         self.energy = max_energy

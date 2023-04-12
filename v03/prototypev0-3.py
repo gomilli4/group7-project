@@ -92,6 +92,7 @@ for i in range(50):
         -np.random.uniform(0, 2*np.pi),
         hashing_grid
         )
+    creature.age = np.random.randint(0, 200)
     creature_group.add(creature)
 
 for i in range(50):
@@ -115,6 +116,7 @@ for i in range(50):
         -np.random.uniform(0, 2*np.pi),
         hashing_grid
         )
+    creature.age = np.random.randint(0, 400)
     creature_group.add(creature)
 
 # debug list contains selected creatures and displays their characteristics
