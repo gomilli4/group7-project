@@ -29,7 +29,7 @@ env_grid, env_cell_group, hashing_grid = create_environment(num_cells_x, num_cel
 
 creature_group = pygame.sprite.Group()
 
-for i in range(50):
+for x in range(50):
     #Randomized Genes for each animal
     genes = {
         'speed': [np.random.uniform(50, 150), np.random.uniform(50, 150)],
@@ -56,7 +56,7 @@ for i in range(50):
     creature_group.add(creature)
 
 #This will add 50 creatures of prey and predator
-for i in range(50):
+for x in range(50):
     genes = {
         'speed': [np.random.uniform(80, 200), np.random.uniform(80, 200)],
         'turn-speed': [np.random.uniform(np.pi/2, 2*np.pi), np.random.uniform(np.pi/2, 2*np.pi)],
