@@ -43,7 +43,7 @@ class Herbivore(pygame.sprite.Sprite):
 
         # pygame drawing information
         self.picture = pygame.image.load('base-herbivore.png').convert_alpha() # converting makes draw time faster I guess
-        self.picture = pygame.transform.scale(self.picture, (20, 20))
+        self.picture = pygame.transform.scale(self.picture, (30, 30))
         # base-herbivore.png is white so the next line
         # tints it to the be color determined by it's genes
         self.picture.fill(self.color, special_flags=pygame.BLEND_MULT)
