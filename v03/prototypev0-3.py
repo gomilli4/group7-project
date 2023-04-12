@@ -26,52 +26,10 @@ num_cells_y = int(height/cell_size)
 # positions to avoid looping through every organism each frame
 env_grid, env_cell_group, hashing_grid = create_environment(num_cells_x, num_cells_y, cell_size)
 
-'''
-Commented block was used for original test creatures.
-These genes seem to be relatively stable so keeping
-them for reference
-
-# test genes dictionary
-genes1 = {
-    'speed': [90, 90],
-    'turn-speed': [100*np.pi/180, 100*np.pi/180],
-    'fov': [270*np.pi/180, 270*np.pi/180],
-    'view-dist': [100, 100],
-    'max-energy': [200, 200],
-    'metabolism-rate': [0.1, 0.1],
-    'find-mate-rate': [0.05, 0.05],
-    'max-desire-to-mate': [60, 60],
-    'sex': [0, 1], # male = [0, 1] or [1, 0], female = [0, 0]
-    'red': [255, 255],
-    'green': [0, 0],
-    'blue': [0, 0]
-    }
-
-genes2 = {
-    'speed': [90, 90],
-    'turn-speed': [130*np.pi/180, 170*np.pi/180],
-    'fov': [90*np.pi/180, 90*np.pi/180],
-    'view-dist': [100, 100],
-    'max-energy': [200, 200],
-    'metabolism-rate': [0.1, 0.1],
-    'find-mate-rate': [0.05, 0.05],
-    'max-desire-to-mate': [60, 60],
-    'sex': [0, 0], # male = [0, 1] or [1, 0], female = [0, 0]
-    'red': [0, 0],
-    'green': [255, 255],
-    'blue': [0, 0]
-    }
-    
-# test creatures
-#test_male = org.Herbivore(genes1, np.random.randint(10, 1290), np.random.randint(10, 590), -np.random.randint(0,360)*np.pi/180, hashing_grid)
-#test_female = org.Herbivore(genes2, np.random.randint(10, 1290), np.random.randint(10, 590), -np.random.randint(0,360)*np.pi/180, hashing_grid)
-#creature_group.add(test_male)
-#creature_group.add(test_female)
-'''
-
 creature_group = pygame.sprite.Group()
 
 for i in range(50):
+    #Randomized Genes for each animal
     genes = {
         'speed': [np.random.uniform(50, 150), np.random.uniform(50, 150)],
         'turn-speed': [np.random.uniform(0, 2*np.pi), np.random.uniform(0, 2*np.pi)],
@@ -86,6 +44,7 @@ for i in range(50):
         'green': [np.random.randint(0, 256), np.random.randint(0, 256)],
         'blue': [np.random.randint(0, 256), np.random.randint(0, 256)]
         }
+    
     creature = org.Herbivore(
         genes,
         np.random.randint(10, 1290), np.random.randint(10, 590),
@@ -95,6 +54,7 @@ for i in range(50):
     creature.age = np.random.randint(0, 200)
     creature_group.add(creature)
 
+#This will add 50 creatures of prey and predator
 for i in range(50):
     genes = {
         'speed': [np.random.uniform(80, 200), np.random.uniform(80, 200)],
