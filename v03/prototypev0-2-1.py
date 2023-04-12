@@ -1,11 +1,12 @@
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pygame
 import sys
-import time
-import organisms as org
+
+from carnivore import Carnivore
 from environment import *
-import matplotlib.pyplot as plt
-import pandas as pd
+from herbivore import Herbivore
 
 # General setup for pygame
 pygame.init()
@@ -63,8 +64,8 @@ genes2 = {
     }
     
 # test creatures
-#test_male = org.Herbivore(genes1, np.random.randint(10, 1290), np.random.randint(10, 590), -np.random.randint(0,360)*np.pi/180, hashing_grid)
-#test_female = org.Herbivore(genes2, np.random.randint(10, 1290), np.random.randint(10, 590), -np.random.randint(0,360)*np.pi/180, hashing_grid)
+#test_male = Herbivore(genes1, np.random.randint(10, 1290), np.random.randint(10, 590), -np.random.randint(0,360)*np.pi/180, hashing_grid)
+#test_female = Herbivore(genes2, np.random.randint(10, 1290), np.random.randint(10, 590), -np.random.randint(0,360)*np.pi/180, hashing_grid)
 #creature_group.add(test_male)
 #creature_group.add(test_female)
 '''
@@ -86,7 +87,7 @@ for i in range(40):
         'green': [np.random.randint(0, 256), np.random.randint(0, 256)],
         'blue': [np.random.randint(0, 256), np.random.randint(0, 256)]
         }
-    creature = org.Herbivore(
+    creature = Herbivore(
         genes,
         np.random.randint(10, 1290), np.random.randint(10, 590),
         -np.random.uniform(0, 2*np.pi),
