@@ -3,7 +3,20 @@ import pygame
 import pandas as pd
 
 class Herbivore(pygame.sprite.Sprite):
+    """
+    Represents a prey in this simulation.
+    """
     def __init__(self, genes, x, y, orientation, hashing_grid):
+        """
+        Initialize a new instance of the prey agent.
+
+        Args:
+        - genes (dict): A dictionary containing genetic information of the predator.
+        - x (float): The x-coordinate of the predator's position.
+        - y (float): The y-coordinate of the predator's position.
+        - orientation (float): The angle of orientation of the predator.
+        - hashing_grid (numpy.ndarray): A 2D numpy array representing the grid used for hashing.
+        """
         super().__init__()
         # position information
         self.angle = orientation
@@ -54,12 +67,12 @@ class Herbivore(pygame.sprite.Sprite):
         self.rect.center = [int(self.pos[0]), int(self.pos[1])]
 
         # state machine
-        '''
+        """
         eating = 0
         finding mate = 1
         fleeing = 2
         wandering = 3
-        '''
+        """
         self.state = 3
         self.doing = False
         self.counter = 0
@@ -70,15 +83,28 @@ class Herbivore(pygame.sprite.Sprite):
         self.neighbor_cells = []
 
     def rotate(self, surface, angle):
-        '''
+        """
         This function exists because pygame's built in rotation functions
         don't work well. They degrade the image quality and eventually
         crash the program. See documentation for more information
-        '''
+
+        Args:
+        - surface (pygame.Surface): The surface to be rotated.
+        - angle (float): The angle of rotation in radians.
+
+        Returns:
+        - pygame.Surface: The rotated surface.
+        """
         rotated_surface = pygame.transform.rotozoom(surface, angle*180/np.pi, 1)
         return rotated_surface
 
     def update_state(self, hashing_grid):
+        """
+        Update the state of the prey.
+
+        Args:
+        - hashing_grid (numpy.ndarray): The spatial hashing grid used for neighbor detection.
+        """
         metabolism_rate = np.mean(self.genes['metabolism-rate'])
         self.energy -= metabolism_rate
         if self.energy <= 0:
@@ -94,15 +120,15 @@ class Herbivore(pygame.sprite.Sprite):
         self.max_energy = np.mean(self.genes['max-energy'])
         hunger = self.max_energy - self.energy
 
-        '''
+        """
         Gets position in spatial_hashing grid then finds neighbors
         according to view distance.
         neighbor_cells contains list of list of nearby creature objects
         to loop through
-        '''
+        """
         column = int(self.pos[0]/25)
         row = int(self.pos[1]/25)
-        self.neighbor_cells = self.getNeighborValues(row, column, hashing_grid)
+        self.neighbor_cells = self.get_neighbor_values(row, column, hashing_grid)
 
         if hunger >= self.desire_mate and self.energy <= 0.28*self.max_energy: # and not see predator
             self.state = 0
@@ -123,6 +149,20 @@ class Herbivore(pygame.sprite.Sprite):
         # if see predator, state = 2
 
     def act(self, grid, dt, hashing_grid, group):
+        """
+        Performs an action based on the current state of the prey.
+
+        State Values:
+        0 - Hungry: Tries to eat grass.
+        1 - Mating: Tries to reproduce with a mate.
+        3 - Random Wander: Wanders around randomly.
+        
+        Args:
+        - grid (numpy.ndarray): The grid of grass.
+        - dt (float): The time step for the simulation.
+        - hashing_grid (numpy.ndarray): The hashing grid for spatial partitioning.
+        - group (pygame.sprite.Group): The sprite group of herbivores the creature belongs to.
+        """
         if self.state == 0:
             # eat the grass
             column = int(self.pos[0]/25)
@@ -135,11 +175,11 @@ class Herbivore(pygame.sprite.Sprite):
                 self.energy = max_energy
                 self.doing = False
 
-            '''
+            """
             The next bit of code sets up alters the random timer. When the
             timer ticks, the creature picks a new random point to move toward
             to simulate it wandering looking for food
-            '''
+            """
             if self.counter % self.counter_max == 0:
                 self.random_x = np.random.randint(10, 1290)
                 self.random_y = np.random.randint(10, 590)
@@ -148,12 +188,12 @@ class Herbivore(pygame.sprite.Sprite):
             self.counter += 1
 
         if self.state == 1:
-            '''
+            """
             Look for mate within view distance
             If potential mate in view, move towards them
             If close enough and can mate and is old enough, request mate
             Female makes baby and adds it to creature_group
-            '''
+            """
             nearest_potential_mate = None
             for cell in self.neighbor_cells:
                 for creature in cell:
@@ -201,6 +241,14 @@ class Herbivore(pygame.sprite.Sprite):
             self.counter += 1
 
     def request_mate(self, mate, hashing_grid, group):
+        """
+        Sends a request to another prey to made
+
+        Args:
+        - mate (Herbivore): The potential mate to request mating with.
+        - hashing_grid (numpy.ndarray): The hashing grid used for spatial partitioning.
+        - group (pygame.sprite.Group): The sprite group of herbivores this is a part of.
+        """
         litter_size = 2
         litter = []
         for i in range(litter_size):
@@ -209,12 +257,15 @@ class Herbivore(pygame.sprite.Sprite):
         mate.receive_request(self, litter, hashing_grid, group)
 
     def form_gamete(self):
-        '''
+        """
         Creatures are haploid, so have 2 copies of each gene on 2 different
         chromosomes. This function mimics "crossing over" in meisois
         and returns a half complete set of genes that will be combined with
         other parent's half set
-        '''
+        
+        Returns:
+        - dict: A dictionary representing a half complete set of genes.
+        """
         haploid_cell = {
             'speed': np.random.choice(self.genes['speed']),
             'turn-speed': np.random.choice(self.genes['turn-speed']),
@@ -253,11 +304,17 @@ class Herbivore(pygame.sprite.Sprite):
         return haploid_cell
 
     def receive_request(self, mate, paternal_litter, hashing_grid, group):
-        '''
+        """
         If it's old enough and can mate and is in the find_mate state it will
         form a gamete and pass the two sets of genes to the create_offspring
         function
-        '''
+
+        Args:
+        - mate (Herbivore): The mate object that sent the mating request.
+        - paternal_gamete (dict): The paternal gamete containing half of the mate's genes.
+        - hashing_grid (numpy.ndarray):The hashing grid object for spatial organization.
+        - group (pygame.sprite.Group): The group of creatures to which both the creature and mate belong.
+        """
         if self.age >= self.maturity and self.can_mate and self.state == 1:
             maternal_litter = []
             for i in range(len(paternal_litter)):
@@ -269,10 +326,16 @@ class Herbivore(pygame.sprite.Sprite):
             self.state = 3
 
     def create_offspring(self, p, m, hashing_grid, group):
-        '''
+        """
         Combines both sets of genes, creates a new Herbivore object,
         and adds it to creature_group to start being drawn and updated
-        '''
+        
+        Args:
+        - p (dict): Paternal gamete containing genes from the father.
+        - m (dict): Maternal gamete containing genes from the mother.
+        - hashing_grid (numpy.ndarray): The hashing grid object for spatial organization.
+        - group (pygame.sprite.Group): The sprite group of creatures to which the offspring will be added.
+        """
         for i in range(len(p)):
             genes = {
                 'speed': [p[i]['speed'], m[i]['speed']],
@@ -292,21 +355,37 @@ class Herbivore(pygame.sprite.Sprite):
             group.add(offspring)
         # self, genes, x, y, orientation, hashing_grid
         
-    def onBoard(self, i, j, grid):
-        '''
-        Code from CMSE 201, used for checking if neighboring cells are on the board
-        '''
-        if i <= grid.shape[0]-1 and i >= 0 and j <= grid.shape[1]-1 and j >= 0:
+    def on_board(self, x, y, grid):
+        """
+        Check if neighboring cells are within the bounds of the simulation.
+
+        Args:
+        - x (int): Row index.
+        - y (int): Column index.
+        - grid (numpy.ndarray): The grid to check against.
+
+        Returns:
+        - bool: True if neighboring cell is within the grid, False otherwise.
+        """
+        if x <= grid.shape[0] - 1 and x >= 0 and y <= grid.shape[1] - 1 and y >= 0:
             return True
         else:
             return False
 
-    def getNeighborValues(self, i, j, board):
-        '''
+    def get_neighbor_values(self, i, j, board):
+        """
         Code mostly from CMSE 201. Instead of checking immediate cell
         neighbors, the number of grid squares to search through is
         calculated using the creature's view distance
-        '''
+
+        Args:
+        - x (int): X-coordinate of the current cell.
+        - y (int): Y-coordinate of the current cell.
+        - board (numpy.ndarray): The grid to retrieve neighbor values from.
+
+        Returns:
+        - list: List of values of neighboring cells on the grid.
+        """
         view_dist = np.mean(self.genes['view-dist'])
         dist = int(np.ceil(view_dist/25))
 
@@ -321,17 +400,21 @@ class Herbivore(pygame.sprite.Sprite):
         # this code runs just like code from CMSE 201
         neighbor_values = []
         for neighbor in neighborhood:
-            if self.onBoard(neighbor[0], neighbor[1], board):
+            if self.on_board(neighbor[0], neighbor[1], board):
                 neighbor_values.append(board[neighbor[0], neighbor[1]])
 
         return neighbor_values
 
     def look_at(self, target, dt):
-        '''
+        """
         Defines vector to target, then normalizes it (gives it length of 1).
         np.sign returns + or -, so the sign variable determines whether the
         angle between the target point and creature is positive or negative.
-        '''
+
+        Args:
+        - target (numpy array): The target point to face.
+        - dt (float): The time step for the update.
+        """
         vec_to_target = target - self.pos
         vec_to_target_norm = vec_to_target/np.linalg.norm(vec_to_target)
 
@@ -347,6 +430,15 @@ class Herbivore(pygame.sprite.Sprite):
         self.angle = self.angle + sign*turn_speed*dt
 
     def update(self, grid, hashing_grid, dt, group):
+        """
+        Updates the state of the herbivore and its position based on its genes and environment.
+
+        Args:
+        - grid (numpy.ndarray): The grid representing the environment and grass.
+        - hashing_grid (numpy.ndarray): The grid used for spatial partitioning of creatures.
+        - dt (float): The time step for the update.
+        - group (pygame.sprite.Group): The sprite group that the creature belongs to.
+        """
         self.update_state(hashing_grid)
         self.act(grid, dt, hashing_grid, group)
         
@@ -415,9 +507,13 @@ class Herbivore(pygame.sprite.Sprite):
             
 
     def debug(self, screen, debug_list):
-        '''
-        The code below draws the creature's FOV
-        '''
+        """
+        The code below draws the creature's FOV and displays energy and mating statistics.
+
+        Args:
+        - screen (pygame.display): The screen to draw on.
+        - debug_list (list): List of creatures for debugging purposes.
+        """
         # collecting FOV and view distance from genes
         view_angle = np.mean(self.genes['fov'])/2
         view_dist = np.mean(self.genes['view-dist'])
@@ -446,10 +542,10 @@ class Herbivore(pygame.sprite.Sprite):
             arc_list.append(point)
         pygame.draw.lines(screen, (255,255,255), False, arc_list) # draws list of points
 
-        '''
+        """
         The code below displays the creature's energy and desire to mate
         statistics
-        '''
+        """
         energy = self.energy
         max_energy = np.mean(self.genes['max-energy'])
 
