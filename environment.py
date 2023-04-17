@@ -110,7 +110,6 @@ def advance_grid(grid, dt):
             If cell has grass, it will grow until it reaches max_grass
             """
             if grid[x, y] == 0:
-                vals = get_neighbor_values(x, y, grid)
                 if max_grass in get_neighbor_values(x, y, grid):
                     new_grid[x, y] = grow_rate * dt
 
