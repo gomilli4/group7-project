@@ -10,26 +10,26 @@ File descriptions:
 - base-herbivore.png:
     This file is the image used for the herbivore in the model
     
-base-carnivore.png:
+- base-carnivore.png:
     This file is the image used for the carnivore in the model
     
-tests:
+- tests:
     This is a directory filled with pngs of graphs, and mutliple csv files. These are from tests run while finalizing the model
     
-Data analysis.ipynb:
+- Data analysis.ipynb:
     This is a jupyter notebook used to generate graphs from csv files 
     
-carnivore.py:
+- carnivore.py:
     This is a python file that defines the carnivore class and its methods
     
-herbivore.py:
+- herbivore.py:
     This is a python file that defines the herbivore class and its methods
     
-environemnt.py:
+- environemnt.py:
     This is a python file that defines functions used in setting up, and iterating through the agent based model
     
-main.py:
+- main.py:
     This python file imports from the other files in the repository, and then runs the model. When run, it plays the animation of the model in a pygame window, and then outputs a csv file containing the genes of all agents that lived in the model.
 
-GOAL - The goal is to accurate model and ecosystem with stable predator-prey dynamics. After achieving the base goal we can add complexity as we wish. We will be using an agent based model simulation with packages like numpy, pandas, seaborn, and pygame. We will also use various data structures like lists, dictionaries, etc.
+- GOAL - The goal is to accurate model and ecosystem with stable predator-prey dynamics. After achieving the base goal we can add complexity as we wish. We will be using an agent based model simulation with packages like numpy, pandas, seaborn, and pygame. We will also use various data structures like lists, dictionaries, etc.
 
