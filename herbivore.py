@@ -395,10 +395,6 @@ class Herbivore(pygame.sprite.Sprite):
             self.dead = True
 
         if self.dead:
-            '''
-            if output file doesn't exist, create it and write genes to file
-            if output file does exist, append genes to file
-            '''
             dict_to_df = {
                 'age-at-death': [self.age],
                 'speed': [np.mean(self.genes['speed'])],
