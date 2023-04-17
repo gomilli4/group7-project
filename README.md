@@ -5,6 +5,8 @@ Group Names: Gary Service, Kanishk Pal, Nitin Polavarapu, Ronald Gomillion, and 
 
 Basic Project Description: This repository is an agent based model for an ecosystem of grass, an herbivore, and a carnivore. Since the animals in this model are objects, they are able to interact with eachother and the environment.The herbivore and carnivores are able to reproduce and mutate, which should cause some natural selection to occur. 
 
+GOAL - The goal is to accurate model and ecosystem with stable predator-prey dynamics. After achieving the base goal we can add complexity as we wish. We will be using an agent based model simulation with packages like numpy, pandas, seaborn, and pygame. We will also use various data structures like lists, dictionaries, etc.
+
 File descriptions:
 
 - base-herbivore.png:
@@ -31,5 +33,5 @@ File descriptions:
 - main.py:
     This python file imports from the other files in the repository, and then runs the model. When run, it plays the animation of the model in a pygame window, and then outputs a csv file containing the genes of all agents that lived in the model.
 
-- GOAL - The goal is to accurate model and ecosystem with stable predator-prey dynamics. After achieving the base goal we can add complexity as we wish. We will be using an agent based model simulation with packages like numpy, pandas, seaborn, and pygame. We will also use various data structures like lists, dictionaries, etc.
+
 

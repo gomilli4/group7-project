@@ -25,7 +25,7 @@ class Carnivore(pygame.sprite.Sprite):
         
         # defining state variables
         self.energy = np.mean(self.genes['max-energy']) # averaging value from both chromosomes
-        self.desire_mate = 0
+        self.desire_to_mate = 0
         self.can_mate = False
         self.can_mate_counter = 0 # used as timer to determine when creature can mate again
         self.can_mate_counter_limit = 30
@@ -56,13 +56,12 @@ class Carnivore(pygame.sprite.Sprite):
         '''
         eating = 0
         finding mate = 1
-        fleeing = 2
         wandering = 3
         '''
         self.state = 3
-        self.doing = False
-        self.counter = 0
-        self.counter_max = 500 # defines the counter for wandering in random direction
+        self.hungry = False
+        self.wander_counter = 0
+        self.wander_counter_max = 500 # defines the counter for wandering in random direction
         self.random_x = np.random.randint(10, 1290)
         self.random_y = np.random.randint(10, 590)
         self.target = None
@@ -78,39 +77,44 @@ class Carnivore(pygame.sprite.Sprite):
         return rotated_surface
 
     def update_state(self, hashing_grid):
-        metabolism_rate = np.mean(self.genes['metabolism-rate'])
+        metabolism_rate = np.mean(self.genes["metabolism-rate"])
         self.energy -= metabolism_rate
         if self.energy <= 0:
-            self.energy = 0
             self.dead = True
+            return
 
-        find_mate_rate = np.mean(self.genes['find-mate-rate'])
-        self.desire_mate += find_mate_rate
-        max_desire = np.mean(self.genes['max-desire-to-mate'])
-        if self.desire_mate >= max_desire:
-            self.desire_mate = max_desire
+        find_mate_rate = np.mean(self.genes["find-mate-rate"])
+        self.desire_to_mate += find_mate_rate
+        max_desire = np.mean(self.genes["max-desire-to-mate"])
+        if self.desire_to_mate >= max_desire:
+            self.desire_to_mate = max_desire
 
-        self.max_energy = np.mean(self.genes['max-energy'])
+        self.max_energy = np.mean(self.genes["max-energy"])
         hunger = self.max_energy - self.energy
 
-        '''
+        """
         Gets position in spatial_hashing grid then finds neighbors
         according to view distance.
         neighbor_cells contains list of list of nearby creature objects
         to loop through
-        '''
-        column = int(self.pos[0]/25)
-        row = int(self.pos[1]/25)
+        """
+        column = int(self.pos[0] / 25)
+        row = int(self.pos[1] / 25)
         self.neighbor_cells = self.getNeighborValues(row, column, hashing_grid)
 
-        if hunger >= self.desire_mate and self.energy <= 0.5*self.max_energy:
+        if hunger >= self.desire_to_mate and self.energy <= 0.5 * self.max_energy:
             self.state = 0
-            self.doing = True
-        
-        if hunger < self.desire_mate and not self.doing and self.can_mate and self.age >= self.maturity: # and not see predator
+            self.hungry = True
+
+        if (
+            hunger < self.desire_to_mate
+            and not self.hungry
+            and self.can_mate
+            and self.age >= self.maturity
+        ):  # and not see predator
             self.state = 1
 
-        if hunger < self.desire_mate and not self.doing and not self.can_mate:
+        if hunger < self.desire_to_mate and not self.hungry and not self.can_mate:
             self.state = 3
             if self.age >= self.maturity:
                 if self.can_mate_counter >= self.can_mate_counter_limit:
@@ -119,29 +123,39 @@ class Carnivore(pygame.sprite.Sprite):
                 else:
                     self.can_mate_counter += 1
 
+
     def act(self, grid, dt, hashing_grid, group):
+        """
+        Based on state, acts in a different manner.
+        0 - Hunting, tries to eat.
+        1 - Mating, tries to reproduce.
+        3 - Random wander
+        """
         if self.state == 0:
-            max_energy = np.mean(self.genes['max-energy'])
-            nearest_potential_prey = None
+            max_energy = np.mean(self.genes["max-energy"])
+            self.target = None
             for cell in self.neighbor_cells:
                 for creature in cell:
-                    if creature != self and creature.ptype == 'prey':
+                    if creature.ptype == "prey":
                         vec_to_creature = creature.pos - self.pos
                         dist_to_creature = np.linalg.norm(vec_to_creature)
-                        vec_to_creature_norm = vec_to_creature/dist_to_creature
-                        fov = np.mean(self.genes['fov'])/2
-                        view_dist = np.mean(self.genes['view-dist'])
-                        
-                        if np.arccos(np.dot(vec_to_creature, self.normal) <= fov and dist_to_creature <= view_dist):
-                            if nearest_potential_prey == None:
-                                nearest_potential_prey = creature
+                        fov = np.mean(self.genes["fov"]) / 2
+                        view_dist = np.mean(self.genes["view-dist"])
+
+                        if np.arccos(
+                            np.dot(vec_to_creature, self.normal) <= fov
+                            and dist_to_creature <= view_dist
+                        ):
+                            if self.target == None:
+                                self.target = creature
                             else:
-                                current_nearest_dist = np.linalg.norm(nearest_potential_prey.pos - self.pos)
+                                current_nearest_dist = np.linalg.norm(
+                                    self.target.pos - self.pos
+                                )
                                 new_potential_dist = np.linalg.norm(creature.pos - self.pos)
                                 if current_nearest_dist < new_potential_dist:
-                                    nearest_potential_prey = creature
-                                
-            self.target = nearest_potential_prey
+                                    self.target = creature
+
             if self.target != None:
                 self.look_at(self.target.pos, dt)
                 vec_to_target = self.target.pos - self.pos
@@ -150,71 +164,52 @@ class Carnivore(pygame.sprite.Sprite):
                     self.energy += 200
                     if self.energy >= max_energy:
                         self.energy = max_energy
-                        self.doing = False
+                        self.hungry = False
                     self.target.dead = True
-                
-            else: # if no prey nearby, just wander around looking for one
-                if self.counter % self.counter_max == 0:
+
+            else:  # if no prey nearby, just wander around looking for one
+                if self.wander_counter % self.wander_counter_max == 0:
                     self.random_x = np.random.randint(10, 1290)
                     self.random_y = np.random.randint(10, 590)
-                    self.counter_max = np.random.randint(100, 750)
+                    self.wander_counter_max = np.random.randint(100, 750)
                 self.look_at(np.array([self.random_x, self.random_y]), dt)
-            self.counter += 1
-
-
-
-
-            '''
-            # eat the grass
-            column = int(self.pos[0]/25)
-            row = int(self.pos[1]/25)
-            grass_amount = grid[row, column]
-            grid[row, column] = 0
-            self.energy += grass_amount/10
-            max_energy = np.mean(self.genes['max-energy'])
-            if self.energy >= max_energy:
-                self.energy = max_energy
-                self.doing = False
-
-            # The next bit of code sets up alters the random timer. When the
-            # timer ticks, the creature picks a new random point to move toward
-            # to simulate it wandering looking for food
-            
-            if self.counter % self.counter_max == 0:
-                self.random_x = np.random.randint(10, 1290)
-                self.random_y = np.random.randint(10, 590)
-                self.counter_max = np.random.randint(100, 750)
-            self.look_at(np.array([self.random_x, self.random_y]), dt)
-            self.counter += 1
-            '''
-            
+            self.wander_counter += 1
 
         if self.state == 1:
-            '''
+            """
             Look for mate within view distance
             If potential mate in view, move towards them
             If close enough and can mate and is old enough, request mate
             Female makes baby and adds it to creature_group
-            '''
+            """
             nearest_potential_mate = None
             for cell in self.neighbor_cells:
                 for creature in cell:
-                    if creature != self and creature.sex != self.sex and creature.ptype == 'predator':
+                    if (
+                        creature != self
+                        and creature.sex != self.sex
+                        and creature.ptype == "predator"
+                    ):
                         vec_to_creature = creature.pos - self.pos
                         dist_to_creature = np.linalg.norm(vec_to_creature)
-                        vec_to_creature_norm = vec_to_creature/dist_to_creature
-                        fov = np.mean(self.genes['fov'])/2
-                        view_dist = np.mean(self.genes['view-dist'])
-                        
-                        if np.arccos(np.dot(vec_to_creature, self.normal) <= fov and dist_to_creature <= view_dist):
+                        vec_to_creature_norm = vec_to_creature / dist_to_creature
+                        fov = np.mean(self.genes["fov"]) / 2
+                        view_dist = np.mean(self.genes["view-dist"])
+
+                        if np.arccos(
+                            np.dot(vec_to_creature, self.normal) <= fov
+                            and dist_to_creature <= view_dist
+                        ):
                             if nearest_potential_mate == None:
                                 nearest_potential_mate = creature
                             else:
-                                current_nearest_dist = np.linalg.norm(nearest_potential_mate.pos - self.pos)
+                                current_nearest_dist = np.linalg.norm(
+                                    nearest_potential_mate.pos - self.pos
+                                )
                                 new_potential_dist = np.linalg.norm(creature.pos - self.pos)
                                 if current_nearest_dist < new_potential_dist:
                                     nearest_potential_mate = creature
-                                
+
             self.target = nearest_potential_mate
             if self.target != None:
                 self.look_at(self.target.pos, dt)
@@ -222,25 +217,26 @@ class Carnivore(pygame.sprite.Sprite):
                 dist_to_target = np.linalg.norm(vec_to_target)
                 if dist_to_target <= 10 and self.sex == 1 and self.can_mate:
                     self.request_mate(self.target, hashing_grid, group)
-                    self.desire_mate = 0
+                    self.desire_to_mate = 0
                     self.can_mate = False
                     self.state = 3
-                
-            else: # if no potential mates nearby, just wander around looking for one
-                if self.counter % self.counter_max == 0:
+
+            else:  # if no potential mates nearby, just wander around looking for one
+                if self.wander_counter % self.wander_counter_max == 0:
                     self.random_x = np.random.randint(10, 1290)
                     self.random_y = np.random.randint(10, 590)
-                    self.counter_max = np.random.randint(100, 750)
+                    self.wander_counter_max = np.random.randint(100, 750)
                 self.look_at(np.array([self.random_x, self.random_y]), dt)
-            self.counter += 1
+            self.wander_counter += 1
 
-        if self.state == 3: # wander state, same as everywhere else
-            if self.counter % self.counter_max == 0:
+        if self.state == 3:  # wander state, same as everywhere else
+            if self.wander_counter % self.wander_counter_max == 0:
                 self.random_x = np.random.randint(10, 1290)
                 self.random_y = np.random.randint(10, 590)
-                self.counter_max = np.random.randint(100, 750)
+                self.wander_counter_max = np.random.randint(100, 750)
             self.look_at(np.array([self.random_x, self.random_y]), dt)
-            self.counter += 1
+            self.wander_counter += 1
+
 
     def request_mate(self, mate, hashing_grid, group):
         gamete = self.form_gamete()
@@ -299,7 +295,7 @@ class Carnivore(pygame.sprite.Sprite):
         if self.age >= self.maturity and self.can_mate and self.state == 1:
             maternal_gamete = self.form_gamete()
             self.create_offspring(paternal_gamete, maternal_gamete, hashing_grid, group)
-            self.desire_mate = 0
+            self.desire_to_mate = 0
             self.can_mate = False
             self.state = 3
 
@@ -472,7 +468,7 @@ class Carnivore(pygame.sprite.Sprite):
         energy = self.energy
         max_energy = np.mean(self.genes['max-energy'])
 
-        desire_mate = self.desire_mate
+        desire_mate = self.desire_to_mate
         max_desire = np.mean(self.genes['max-desire-to-mate'])
         
         bar_length = 100
