@@ -1,6 +1,9 @@
 import numpy as np
 import pygame
 
+max_grass = 50.0
+grow_rate = 3
+
 def grass_color_gradient(x):
     """
     Dirt to grass gradient generated from colordesigner.io/gradient-generator.
@@ -50,7 +53,7 @@ def create_environment(num_cells_x, num_cells_y, cell_size):
     """
     Initializes the environement and creates the cells
     """
-    env_grid = np.full((num_cells_y, num_cells_x), 50)
+    env_grid = np.full((num_cells_y, num_cells_x), max_grass)
 
     hashing_grid = np.zeros((num_cells_y, num_cells_x), dtype=object)
 
@@ -97,9 +100,6 @@ def advance_grid(grid, dt):
     grid is used by the environment pygame sprite group to update their
     color on the screen
     """
-    max_grass = 50
-    grow_rate = 2
-
     new_grid = np.zeros_like(grid)
 
     for x in range(grid.shape[0]):
@@ -110,8 +110,9 @@ def advance_grid(grid, dt):
             If cell has grass, it will grow until it reaches max_grass
             """
             if grid[x, y] == 0:
+                vals = get_neighbor_values(x, y, grid)
                 if max_grass in get_neighbor_values(x, y, grid):
-                    new_grid[x, y] = 0 + grow_rate * dt
+                    new_grid[x, y] = grow_rate * dt
 
             elif grid[x, y] > 0 and grid[x, y] < max_grass:
                 next_value = grid[x, y] + grow_rate * dt
