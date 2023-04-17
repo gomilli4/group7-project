@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+import pandas as pd
 
 class Herbivore(pygame.sprite.Sprite):
     def __init__(self, genes, x, y, orientation, hashing_grid):
@@ -394,6 +395,25 @@ class Herbivore(pygame.sprite.Sprite):
             self.dead = True
 
         if self.dead:
+            '''
+            if output file doesn't exist, create it and write genes to file
+            if output file does exist, append genes to file
+            '''
+            dict_to_df = {
+                'age-at-death': [self.age],
+                'speed': [np.mean(self.genes['speed'])],
+                'turn-speed': [np.mean(self.genes['turn-speed'])],
+                'fov': [np.mean(self.genes['fov'])],
+                'view-dist': [np.mean(self.genes['view-dist'])],
+                'max-energy': [np.mean(self.genes['max-energy'])],
+                'metabolism-rate': [np.mean(self.genes['metabolism-rate'])],
+                'find-mate-rate': [np.mean(self.genes['find-mate-rate'])],
+                'max-desire-to-mate': [np.mean(self.genes['max-desire-to-mate'])]
+                }
+            df = pd.DataFrame(dict_to_df)
+            location = location = 'prey-genes-data.csv'
+            df.to_csv(location, mode='a')
+            
             self.kill() # removes creature from all pygame sprite groups
             hashing_grid[row, column].remove(self) # removes creature from hashing grid
             
