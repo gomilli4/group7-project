@@ -25,6 +25,9 @@ def grass_color_gradient(x):
 
     Smooth interpolation may be possible through some other method.
     Look into HSV or HSL
+
+    Args:
+    - x (double): Value of grass to be colored.
     """
     if 0 <= x and x < 0.1:
         return (205, 133, 63)
@@ -51,7 +54,12 @@ def grass_color_gradient(x):
 
 def create_environment(num_cells_x, num_cells_y, cell_size):
     """
-    Initializes the environement and creates the cells
+    Initializes the environment and creates the cells
+
+    Args:
+    - num_cells_x (int): Number of cells in the x-axis.
+    - num_cells_y (int): Number of cells in the y-axis.
+    - cell_size (int): Size of each cell.
     """
     env_grid = np.full((num_cells_y, num_cells_x), max_grass)
 
@@ -62,30 +70,46 @@ def create_environment(num_cells_x, num_cells_y, cell_size):
     env_cell_group = pygame.sprite.Group()
 
     # Generating environment cells
-    for j in range(num_cells_x):
-        for i in range(num_cells_y):
-            hashing_grid[i, j] = []
-            cell = Env_Cell(j * cell_size, i * cell_size, j, i, cell_size)
+    for x in range(num_cells_x):
+        for y in range(num_cells_y):
+            hashing_grid[y, x] = []
+            cell = Env_Cell(x * cell_size, y * cell_size, x, y, cell_size)
             env_cell_group.add(cell)
 
     return env_grid, env_cell_group, hashing_grid
 
-def on_board(i, j, grid):
+def on_board(self, x, y, grid):
     """
-    Code from CMSE 201, used for checking if neighboring cells are on the board
+    Check if neighboring cells are within the bounds of the simulation.
+
+    Args:
+    - x (int): Row index.
+    - y (int): Column index.
+    - grid (numpy.ndarray): The grid to check against.
+
+    Returns:
+    - bool: True if neighboring cell is within the grid, False otherwise.
     """
-    if i <= grid.shape[0] - 1 and i >= 0 and j <= grid.shape[1] - 1 and j >= 0:
+    if x <= grid.shape[0] - 1 and x >= 0 and y <= grid.shape[1] - 1 and y >= 0:
         return True
     else:
         return False
 
-def get_neighbor_values(i, j, board):
+def get_neighbor_values(x, y, board):
     """
     Code from CMSE 201, used to check the values of the neighboring cells.
     As per the grass growing rules, if a neighbor cell has an amount
     of grass > 0, the cell starts growing grass itself
+
+    Args:
+    - x (int): x-coordinate of the cell.
+    - y (int): y-coordinate of the cell.
+    - board (numpy.ndarray): Board representing the environment.
+
+    Returns:
+    - neighbor_values (list): List of values of neighboring cells.
     """
-    neighborhood = [(i - 1, j), (i, j - 1), (i + 1, j), (i, j + 1)]
+    neighborhood = [(x - 1, y), (x, y - 1), (x + 1, y), (x, y + 1)]
 
     neighbor_values = []
     for neighbor in neighborhood:
@@ -99,6 +123,13 @@ def advance_grid(grid, dt):
     Code from CSME 201. Used to update the environment grid. The updated
     grid is used by the environment pygame sprite group to update their
     color on the screen
+
+    Args:
+    - grid (numpy.ndarray): Grid representing the environment.
+    - dt (float): Time step for updating the grid.
+
+    Returns:
+    - new_grid (numpy.ndarray): Updated grid with grass growth.
     """
     new_grid = np.zeros_like(grid)
 
@@ -131,6 +162,16 @@ class Env_Cell(pygame.sprite.Sprite):
     for drawing to the screen
     """
     def __init__(self, x, y, id_x, id_y, size):
+        """
+        Initializes an instance of Env_Cell.
+        
+        Args:
+        - x (int): x-coordinate of the cell's top-left corner.
+        - y (int): y-coordinate of the cell's top-left corner.
+        - id_x (int): x-index of the cell in the grid.
+        - id_y (int): y-index of the cell in the grid.
+        - size (int): Size of the cell (width and height).
+        """
         super().__init__()
         self.pos_x = x
         self.pos_y = y
@@ -146,6 +187,12 @@ class Env_Cell(pygame.sprite.Sprite):
         self.rect.topleft = [self.pos_x, self.pos_y]
 
     def update(self, grid):
+        """
+        Updates the cell's attributes based on the current state of the environment grid.
+
+        Args:
+        - grid (numpy array): Grid representing the environment.
+        """
         # gets the grass amount from the environment grid
         self.grass = grid[self.id_y, self.id_x]
 

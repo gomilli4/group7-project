@@ -29,8 +29,8 @@ env_grid, env_cell_group, hashing_grid = create_environment(num_cells_x, num_cel
 
 creature_group = pygame.sprite.Group()
 
-for x in range(80):
-    #Randomized Genes for each animal
+for i in range(80):
+    # Randomized Genes for each animal
     genes = {
         'speed': [np.random.uniform(50, 150), np.random.uniform(50, 150)],
         'turn-speed': [np.random.uniform(0, 2*np.pi), np.random.uniform(0, 2*np.pi)],
@@ -40,7 +40,7 @@ for x in range(80):
         'metabolism-rate': [np.random.uniform(0.01, 0.5), np.random.uniform(0.01, 0.5)],
         'find-mate-rate': [np.random.uniform(0.1, 5), np.random.uniform(0.1, 5)],
         'max-desire-to-mate': [np.random.uniform(40, 75), np.random.uniform(40, 75)],
-        'sex': [x % 2, 0], # male = [0, 1] or [1, 0], female = [0, 0]
+        'sex': [i % 2, 0], # male = [0, 1] or [1, 0], female = [0, 0]
         'red': [np.random.randint(0, 256), np.random.randint(0, 256)],
         'green': [np.random.randint(0, 256), np.random.randint(0, 256)],
         'blue': [np.random.randint(0, 256), np.random.randint(0, 256)]
@@ -56,7 +56,7 @@ for x in range(80):
     creature_group.add(creature)
 
 #This will add 50 creatures of prey and predator
-for x in range(80):
+for i in range(80):
     genes = {
         'speed': [np.random.uniform(80, 200), np.random.uniform(80, 200)],
         'turn-speed': [np.random.uniform(np.pi/2, 2*np.pi), np.random.uniform(np.pi/2, 2*np.pi)],
@@ -66,7 +66,7 @@ for x in range(80):
         'metabolism-rate': [np.random.uniform(0.01, 0.5), np.random.uniform(0.01, 0.5)],
         'find-mate-rate': [np.random.uniform(5, 10), np.random.uniform(5, 10)],
         'max-desire-to-mate': [np.random.uniform(40, 75), np.random.uniform(40, 75)],
-        'sex': [x % 2, 0], # male = [0, 1] or [1, 0], female = [0, 0]
+        'sex': [i % 2, 0], # male = [0, 1] or [1, 0], female = [0, 0]
         'red': [np.random.randint(0, 256), np.random.randint(0, 256)],
         'green': [np.random.randint(0, 256), np.random.randint(0, 256)],
         'blue': [np.random.randint(0, 256), np.random.randint(0, 256)]
