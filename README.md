@@ -7,7 +7,7 @@ Basic Project Description: This repository is an agent based model for an ecosys
 
 File descriptions:
 
-base-herbivore.png:
+- base-herbivore.png:
     This file is the image used for the herbivore in the model
     
 base-carnivore.png:
