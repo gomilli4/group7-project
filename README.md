@@ -1,11 +1,11 @@
 # group7-project
-CMSE 202 - Group Project
+CMSE 202 - Modeling an Ecosystem Project
 
 Group Names: Gary Service, Kanishk Pal, Nitin Polavarapu, Ronald Gomillion, and Sage Foster
 
 Basic Project Description: This repository is an agent based model for an ecosystem of grass, an herbivore, and a carnivore. Since the animals in this model are objects, they are able to interact with eachother and the environment.The herbivore and carnivores are able to reproduce and mutate, which should cause some natural selection to occur. 
 
-GOAL - The goal is to accurate model and ecosystem with stable predator-prey dynamics. After achieving the base goal we can add complexity as we wish. We will be using an agent based model simulation with packages like numpy, pandas, seaborn, and pygame. We will also use various data structures like lists, dictionaries, etc.
+GOAL - The goal is to accurate model and ecosystem with stable predator-prey dynamics. After achieving the base goal we can add complexity as we wish. We will be using an agent based model simulation with packages like numpy, pandas, mathplotlib, and pygame. We will also use various data structures like lists, dictionaries, etc.
 
 File descriptions:
 
