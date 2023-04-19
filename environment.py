@@ -78,7 +78,7 @@ def create_environment(num_cells_x, num_cells_y, cell_size):
 
     return env_grid, env_cell_group, hashing_grid
 
-def on_board(self, x, y, grid):
+def on_board(x, y, grid):
     """
     Check if neighboring cells are within the bounds of the simulation.
 
