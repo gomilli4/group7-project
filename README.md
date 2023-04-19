@@ -18,9 +18,6 @@ File descriptions:
 - tests:
     This is a directory filled with pngs of graphs, and mutliple csv files. These are from tests run while finalizing the model
     
-- Data analysis.ipynb:
-    This is a jupyter notebook used to generate graphs from csv files 
-    
 - carnivore.py:
     This is a python file that defines the carnivore class and its methods
     
