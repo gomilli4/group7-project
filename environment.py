@@ -28,6 +28,9 @@ def grass_color_gradient(x):
 
     Args:
     - x (double): Value of grass to be colored.
+
+    Returns:
+    - None
     """
     if 0 <= x and x < 0.1:
         return (205, 133, 63)
@@ -60,6 +63,11 @@ def create_environment(num_cells_x, num_cells_y, cell_size):
     - num_cells_x (int): Number of cells in the x-axis.
     - num_cells_y (int): Number of cells in the y-axis.
     - cell_size (int): Size of each cell.
+
+    Returns:
+    - env_grid (np.array(int)): Numpy array representing environment
+    - hashing_grid (np.array(int)): Numpy array that is used for storing creatures at every time-step
+    - env_cell_group (pygame.sprite.group):  Sprite group containing each environment cell
     """
     env_grid = np.full((num_cells_y, num_cells_x), max_grass)
 
@@ -192,6 +200,9 @@ class Env_Cell(pygame.sprite.Sprite):
 
         Args:
         - grid (numpy array): Grid representing the environment.
+
+        Returns:
+        - None
         """
         # gets the grass amount from the environment grid
         self.grass = grid[self.id_y, self.id_x]

@@ -102,6 +102,9 @@ class Carnivore(pygame.sprite.Sprite):
 
         Args:
         - hashing_grid (numpy.ndarray): The spatial hashing grid used for neighbor detection.
+
+        Returns:
+        - None
         """
         metabolism_rate = np.mean(self.genes["metabolism-rate"])
         self.energy -= metabolism_rate
@@ -280,6 +283,9 @@ class Carnivore(pygame.sprite.Sprite):
         - mate (Carnivore): The potential mate to request mating with.
         - hashing_grid (numpy.ndarray): The hashing grid used for spatial partitioning.
         - group (pygame.sprite.Group): The sprite group of carnivores this is a part of.
+
+        Returns:
+        - None
         """
         gamete = self.form_gamete()
         mate.receive_request(self, gamete, hashing_grid, group)
@@ -436,6 +442,9 @@ class Carnivore(pygame.sprite.Sprite):
         Args:
         - target (numpy array): The target point to face.
         - dt (float): The time step for the update.
+
+        Returns:
+        - None
         """
         vec_to_target = target - self.pos
         vec_to_target_norm = vec_to_target / np.linalg.norm(vec_to_target)
@@ -460,6 +469,9 @@ class Carnivore(pygame.sprite.Sprite):
         - hashing_grid (numpy.ndarray): The grid used for spatial partitioning of creatures.
         - dt (float): The time step for the update.
         - group (pygame.sprite.Group): The sprite group that the creature belongs to.
+
+        Returns:
+        - None
         """
         self.update_state(hashing_grid)
         self.act(grid, dt, hashing_grid, group)
@@ -519,6 +531,9 @@ class Carnivore(pygame.sprite.Sprite):
         Args:
         - screen (pygame.display): The screen to draw on.
         - debug_list (list): List of creatures for debugging purposes.
+
+        Returns:
+        - None
         """
         # collecting FOV and view distance from genes
         view_angle = np.mean(self.genes['fov'])/2

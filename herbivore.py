@@ -16,6 +16,9 @@ class Herbivore(pygame.sprite.Sprite):
         - y (float): The y-coordinate of the predator's position.
         - orientation (float): The angle of orientation of the predator.
         - hashing_grid (numpy.ndarray): A 2D numpy array representing the grid used for hashing.
+
+        Returns:
+        - None
         """
         super().__init__()
         # position information
@@ -104,6 +107,9 @@ class Herbivore(pygame.sprite.Sprite):
 
         Args:
         - hashing_grid (numpy.ndarray): The spatial hashing grid used for neighbor detection.
+
+        Returns:
+        - None
         """
         metabolism_rate = np.mean(self.genes['metabolism-rate'])
         self.energy -= metabolism_rate
@@ -162,6 +168,9 @@ class Herbivore(pygame.sprite.Sprite):
         - dt (float): The time step for the simulation.
         - hashing_grid (numpy.ndarray): The hashing grid for spatial partitioning.
         - group (pygame.sprite.Group): The sprite group of herbivores the creature belongs to.
+
+        Returns:
+        - None
         """
         if self.state == 0:
             # eat the grass
@@ -248,6 +257,9 @@ class Herbivore(pygame.sprite.Sprite):
         - mate (Herbivore): The potential mate to request mating with.
         - hashing_grid (numpy.ndarray): The hashing grid used for spatial partitioning.
         - group (pygame.sprite.Group): The sprite group of herbivores this is a part of.
+
+        Returns:
+        - None
         """
         litter_size = 2
         litter = []
@@ -262,6 +274,9 @@ class Herbivore(pygame.sprite.Sprite):
         chromosomes. This function mimics "crossing over" in meisois
         and returns a half complete set of genes that will be combined with
         other parent's half set
+
+        Args:
+        - None
         
         Returns:
         - dict: A dictionary representing a half complete set of genes.
@@ -314,6 +329,9 @@ class Herbivore(pygame.sprite.Sprite):
         - paternal_gamete (dict): The paternal gamete containing half of the mate's genes.
         - hashing_grid (numpy.ndarray):The hashing grid object for spatial organization.
         - group (pygame.sprite.Group): The group of creatures to which both the creature and mate belong.
+
+        Returns:
+        - None
         """
         if self.age >= self.maturity and self.can_mate and self.state == 1:
             maternal_litter = []
@@ -335,6 +353,9 @@ class Herbivore(pygame.sprite.Sprite):
         - m (dict): Maternal gamete containing genes from the mother.
         - hashing_grid (numpy.ndarray): The hashing grid object for spatial organization.
         - group (pygame.sprite.Group): The sprite group of creatures to which the offspring will be added.
+
+        Returns:
+        - None
         """
         for i in range(len(p)):
             genes = {
@@ -414,6 +435,9 @@ class Herbivore(pygame.sprite.Sprite):
         Args:
         - target (numpy array): The target point to face.
         - dt (float): The time step for the update.
+
+        Returns:
+        - None
         """
         vec_to_target = target - self.pos
         vec_to_target_norm = vec_to_target/np.linalg.norm(vec_to_target)
@@ -438,6 +462,9 @@ class Herbivore(pygame.sprite.Sprite):
         - hashing_grid (numpy.ndarray): The grid used for spatial partitioning of creatures.
         - dt (float): The time step for the update.
         - group (pygame.sprite.Group): The sprite group that the creature belongs to.
+
+        Returns:
+        - None
         """
         self.update_state(hashing_grid)
         self.act(grid, dt, hashing_grid, group)
@@ -513,6 +540,9 @@ class Herbivore(pygame.sprite.Sprite):
         Args:
         - screen (pygame.display): The screen to draw on.
         - debug_list (list): List of creatures for debugging purposes.
+
+        Returns:
+        - None
         """
         # collecting FOV and view distance from genes
         view_angle = np.mean(self.genes['fov'])/2
