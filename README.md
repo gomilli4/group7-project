@@ -30,5 +30,10 @@ File descriptions:
 - main.py:
     This python file imports from the other files in the repository, and then runs the model. When run, it plays the animation of the model in a pygame window, and then outputs a csv file containing the genes of all agents that lived in the model.
 
+Dependencies:
+
+- numpy, matplotlib, pygame, pandas
+
+- To run, run 'main.py'
 
 
